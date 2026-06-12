@@ -1,1213 +1,638 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>韓国料理レシピアプリ 🇰🇷</title>
-  <style>
-    :root {
-      --red: #C0392B;
-      --red-light: #E74C3C;
-      --red-bg: #fdf2f2;
-      --blue: #2C3E7A;
-      --blue-light: #3D5FA0;
-      --white: #fff;
-      --gray-light: #f5f5f5;
-      --gray: #e0e0e0;
-      --text: #2c2c2c;
-      --text-muted: #777;
-      --radius: 14px;
-      --shadow: 0 4px 20px rgba(0,0,0,0.08);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#d62828">
+<meta name="description" content="冷蔵庫の食材から作れる韓国料理を探せるレシピアプリ。60品のレシピを収録。">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="韓国レシピ">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>韓国料理レシピ 🇰🇷 — 食材から探せるレシピアプリ</title>
+<style>
+:root{
+  --red:#d62828;
+  --red-dark:#b51f1f;
+  --orange:#f77f3f;
+  --green:#2a9d4a;
+  --bg:#fff7f5;
+  --card:#ffffff;
+  --text:#2b2b2b;
+  --muted:#8a8a8a;
+  --line:#f0e4e0;
+  --radius:16px;
+  --shadow:0 4px 18px rgba(180,60,40,.10);
+  --nav-h:62px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Hiragino Sans",Meiryo,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  min-height:100dvh;
+  line-height:1.55;
+  padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px);
+}
+button{font-family:inherit;cursor:pointer;touch-action:manipulation;border:none;background:none}
+input{font-family:inherit}
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+/* ===== Header ===== */
+.app-header{
+  background:linear-gradient(135deg,var(--red) 0%,var(--orange) 100%);
+  color:#fff;
+  padding:calc(18px + env(safe-area-inset-top)) 16px 18px;
+  border-radius:0 0 22px 22px;
+  box-shadow:var(--shadow);
+}
+.header-inner{max-width:980px;margin:0 auto;text-align:center}
+.app-header h1{font-size:1.45rem;font-weight:800;letter-spacing:.02em}
+.app-header p{font-size:.82rem;opacity:.9;margin-top:2px}
+.mode-switch{
+  display:none;
+  margin:16px auto 0;
+  background:rgba(255,255,255,.18);
+  border-radius:999px;
+  padding:4px;
+  max-width:420px;
+  gap:4px;
+}
+.mode-btn{
+  flex:1;
+  padding:10px 18px;
+  border-radius:999px;
+  color:#fff;
+  font-size:.92rem;
+  font-weight:700;
+  transition:background .2s,color .2s;
+}
+.mode-btn.active{background:#fff;color:var(--red)}
 
-    body {
-      font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
-      background: linear-gradient(135deg, #fff5f5 0%, #f0f4ff 100%);
-      min-height: 100vh;
-      color: var(--text);
-    }
+/* ===== Layout ===== */
+main{max-width:980px;margin:0 auto;padding:16px 14px 0}
 
-    header {
-      background: linear-gradient(135deg, var(--red) 0%, var(--blue) 100%);
-      color: white;
-      text-align: center;
-      padding: 28px 20px 20px;
-    }
-    header h1 { font-size: 2rem; font-weight: 800; letter-spacing: 0.02em; }
-    header p { font-size: 0.95rem; opacity: 0.88; margin-top: 6px; }
+/* ===== Search card ===== */
+.search-card{
+  background:var(--card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:16px;
+  margin-bottom:18px;
+}
+.section-label{font-size:1rem;font-weight:800;margin-bottom:12px}
+.input-row{display:flex;gap:8px}
+.input-row input{
+  flex:1;
+  min-width:0;
+  padding:12px 14px;
+  border:2px solid var(--line);
+  border-radius:12px;
+  font-size:16px; /* 16px未満だとiOSがフォーカス時に自動ズームする */
+  outline:none;
+  background:#fff;
+  transition:border-color .2s;
+  -webkit-appearance:none;
+  appearance:none;
+}
+.input-row input:focus{border-color:var(--orange)}
+.add-btn{
+  padding:0 20px;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--red),var(--orange));
+  color:#fff;
+  font-size:.95rem;
+  font-weight:700;
+  white-space:nowrap;
+}
+.add-btn:active{transform:scale(.96)}
 
-    .tabs {
-      display: flex;
-      background: white;
-      border-bottom: 2px solid var(--gray);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 14px 8px;
-      border: none;
-      background: none;
-      cursor: pointer;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      transition: all 0.2s;
-      border-bottom: 3px solid transparent;
-      line-height: 1.4;
-    }
-    .tab-btn:hover { color: var(--red); background: var(--red-bg); }
-    .tab-btn.active {
-      color: var(--red);
-      border-bottom-color: var(--red);
-      background: var(--red-bg);
-    }
-    .tab-btn .icon { font-size: 1.3rem; display: block; margin-bottom: 3px; }
+.tags-area{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.tags-area:empty{margin-top:0}
+.tag{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:var(--red);
+  color:#fff;
+  border-radius:999px;
+  padding:7px 8px 7px 14px;
+  font-size:.88rem;
+  font-weight:700;
+}
+.tag-remove{
+  width:22px;height:22px;
+  border-radius:50%;
+  background:rgba(255,255,255,.25);
+  color:#fff;
+  font-size:11px;
+  line-height:1;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+.quick-label{font-size:.78rem;color:var(--muted);margin:14px 0 8px}
+.quick-tags{display:flex;flex-wrap:wrap;gap:8px}
+.quick-tag{
+  padding:8px 14px;
+  border-radius:999px;
+  border:1.5px solid var(--line);
+  background:#fff;
+  font-size:.86rem;
+  color:var(--text);
+  transition:all .15s;
+}
+.quick-tag.selected{
+  background:var(--red);
+  border-color:var(--red);
+  color:#fff;
+  font-weight:700;
+}
+.quick-tag:active{transform:scale(.95)}
 
-    .tab-panel { display: none; padding: 24px 16px; max-width: 680px; margin: 0 auto; }
-    .tab-panel.active { display: block; }
+/* ===== Empty state ===== */
+.empty-state{
+  text-align:center;
+  padding:48px 20px;
+  background:var(--card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+.empty-emoji{font-size:3rem;margin-bottom:10px}
+.empty-title{font-size:1.05rem;font-weight:800;margin-bottom:6px}
+.empty-desc{font-size:.85rem;color:var(--muted)}
 
-    .section-title {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--blue);
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+/* ===== Results ===== */
+.results-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin:4px 2px 12px;
+}
+.results-header h2{font-size:1.05rem;font-weight:800}
+.results-count{
+  background:var(--red);
+  color:#fff;
+  font-size:.75rem;
+  font-weight:700;
+  border-radius:999px;
+  padding:3px 12px;
+}
+.results-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:720px){.results-grid{grid-template-columns:repeat(2,1fr)}}
 
-    .input-row {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    .input-row input {
-      flex: 1;
-      padding: 12px 16px;
-      border: 2px solid var(--gray);
-      border-radius: 10px;
-      font-size: 1rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .input-row input:focus { border-color: var(--red-light); }
-    .btn {
-      padding: 12px 20px;
-      border: none;
-      border-radius: 10px;
-      background: linear-gradient(135deg, var(--red) 0%, var(--red-light) 100%);
-      color: white;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-      white-space: nowrap;
-    }
-    .btn:hover { opacity: 0.9; }
-    .btn:active { transform: scale(0.97); }
-    .btn-secondary {
-      background: linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
-    }
+.recipe-card{
+  position:relative;
+  background:var(--card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:16px;
+  cursor:pointer;
+  transition:transform .15s,box-shadow .15s;
+}
+.recipe-card:active{transform:scale(.985)}
+.card-top{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+.card-emoji{
+  font-size:2rem;
+  width:56px;height:56px;
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg);
+  border-radius:14px;
+}
+.card-info{min-width:0;padding-right:18px}
+.card-title{font-size:1.02rem;font-weight:800}
+.card-korean{font-size:.78rem;font-weight:500;color:var(--muted)}
+.card-desc{
+  font-size:.82rem;color:var(--muted);margin-top:3px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.match-bar-wrap{margin-bottom:10px}
+.match-label{
+  display:flex;justify-content:space-between;
+  font-size:.74rem;color:var(--muted);margin-bottom:4px;
+}
+.match-label .pct{font-weight:800;color:var(--red)}
+.match-bar{height:8px;background:var(--line);border-radius:999px;overflow:hidden}
+.match-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--orange),var(--red));
+  border-radius:999px;
+  transition:width .4s ease;
+}
+.card-tags{display:flex;flex-wrap:wrap;gap:6px}
+.card-tag{font-size:.72rem;font-weight:700;border-radius:999px;padding:4px 10px}
+.card-tag.have{background:#e8f6ec;color:var(--green)}
+.card-tag.need{background:#f4f4f4;color:#999}
+.card-arrow{
+  position:absolute;top:18px;right:14px;
+  color:#ccc;font-size:1.4rem;font-weight:700;line-height:1;
+}
 
-    .tag-area {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 14px;
-      min-height: 36px;
-    }
-    .tag {
-      background: var(--blue);
-      color: white;
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .tag .remove {
-      cursor: pointer;
-      opacity: 0.8;
-      font-size: 1rem;
-      line-height: 1;
-    }
-    .tag .remove:hover { opacity: 1; }
+/* ===== Recipe list (mini cards) ===== */
+.all-recipes-grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:720px){.all-recipes-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:980px){.all-recipes-grid{grid-template-columns:repeat(3,1fr)}}
+.mini-card{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);
+  border-radius:14px;
+  box-shadow:var(--shadow);
+  padding:12px 14px;
+  cursor:pointer;
+  transition:transform .15s;
+}
+.mini-card:active{transform:scale(.98)}
+.mini-emoji{
+  font-size:1.5rem;
+  width:46px;height:46px;
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg);
+  border-radius:12px;
+}
+.mini-info{min-width:0;flex:1}
+.mini-title{font-size:.94rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini-sub{font-size:.75rem;color:var(--muted)}
+.mini-arrow{color:#ccc;font-size:1.3rem;font-weight:700}
 
-    .hint-label {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-    }
+/* ===== Bottom navigation (mobile) ===== */
+.bottom-nav{
+  position:fixed;
+  left:0;right:0;bottom:0;
+  z-index:50;
+  display:flex;
+  background:rgba(255,255,255,.96);
+  -webkit-backdrop-filter:blur(10px);
+  backdrop-filter:blur(10px);
+  border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom);
+  height:calc(var(--nav-h) + env(safe-area-inset-bottom));
+}
+.nav-btn{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  font-size:.7rem;
+  font-weight:700;
+  color:var(--muted);
+}
+.nav-btn .nav-icon{font-size:1.3rem;line-height:1}
+.nav-btn.active{color:var(--red)}
+@media(min-width:720px){
+  .bottom-nav{display:none}
+  .mode-switch{display:flex}
+  body{padding-bottom:32px}
+}
 
-    .results { margin-top: 20px; }
+/* ===== Scroll-top button ===== */
+#scrollTopBtn{
+  position:fixed;
+  right:16px;
+  bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px);
+  z-index:40;
+  width:44px;height:44px;
+  border-radius:50%;
+  background:var(--red);
+  color:#fff;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(180,40,30,.35);
+  opacity:0;
+  pointer-events:none;
+  transform:translateY(10px);
+  transition:opacity .25s,transform .25s;
+}
+#scrollTopBtn.show{opacity:1;pointer-events:auto;transform:translateY(0)}
+@media(min-width:720px){#scrollTopBtn{bottom:24px}}
 
-    .dish-card {
-      background: white;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      margin-bottom: 16px;
-      overflow: hidden;
-      transition: transform 0.15s, box-shadow 0.15s;
-      cursor: pointer;
-    }
-    .dish-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 28px rgba(0,0,0,0.13);
-    }
-    .dish-card-header {
-      padding: 16px 18px 12px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      border-bottom: 1px solid var(--gray);
-    }
-    .dish-emoji { font-size: 2.2rem; }
-    .dish-name-block { flex: 1; }
-    .dish-name-jp { font-size: 1.1rem; font-weight: 700; }
-    .dish-name-kr { font-size: 0.85rem; color: var(--text-muted); margin-top: 2px; }
-    .match-badge {
-      background: var(--red-bg);
-      color: var(--red);
-      border: 1px solid #f9c6c6;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 700;
-    }
-    .dish-card-body { padding: 14px 18px 16px; }
-    .dish-desc { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px; }
-    .ingredient-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-    .chip {
-      background: var(--gray-light);
-      padding: 3px 10px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      color: var(--text);
-    }
-    .chip.matched {
-      background: #fde8e8;
-      color: var(--red);
-      font-weight: 600;
-    }
-
-    .recipe-card {
-      background: white;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-    .recipe-header {
-      background: linear-gradient(135deg, var(--red) 0%, var(--blue) 100%);
-      color: white;
-      padding: 20px 20px 16px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .recipe-emoji { font-size: 3rem; }
-    .recipe-title { font-size: 1.4rem; font-weight: 800; }
-    .recipe-subtitle { font-size: 0.9rem; opacity: 0.85; margin-top: 4px; }
-    .recipe-body { padding: 20px; }
-    .recipe-section { margin-bottom: 20px; }
-    .recipe-section-title {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--blue);
-      border-left: 4px solid var(--red);
-      padding-left: 10px;
-      margin-bottom: 12px;
-    }
-    .ingredient-list { list-style: none; }
-    .ingredient-list li {
-      padding: 7px 0;
-      border-bottom: 1px solid var(--gray-light);
-      display: flex;
-      gap: 8px;
-      font-size: 0.92rem;
-    }
-    .ingredient-list li:last-child { border-bottom: none; }
-    .ing-bullet { color: var(--red); font-weight: 700; }
-    .step-list { list-style: none; counter-reset: steps; }
-    .step-list li {
-      counter-increment: steps;
-      padding: 10px 0 10px 44px;
-      border-bottom: 1px solid var(--gray-light);
-      font-size: 0.92rem;
-      line-height: 1.6;
-      position: relative;
-    }
-    .step-list li:last-child { border-bottom: none; }
-    .step-list li::before {
-      content: counter(steps);
-      position: absolute;
-      left: 0;
-      top: 10px;
-      width: 28px;
-      height: 28px;
-      background: linear-gradient(135deg, var(--red) 0%, var(--red-light) 100%);
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.8rem;
-    }
-    .meta-row {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
-    }
-    .meta-item {
-      background: var(--gray-light);
-      padding: 8px 14px;
-      border-radius: 10px;
-      font-size: 0.85rem;
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--text-muted);
-    }
-    .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
-    .empty-state p { font-size: 0.95rem; }
-
-    .dish-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 10px;
-      margin-top: 16px;
-    }
-    .dish-grid-item {
-      background: white;
-      border-radius: var(--radius);
-      padding: 14px 10px;
-      text-align: center;
-      cursor: pointer;
-      box-shadow: var(--shadow);
-      transition: transform 0.15s;
-      border: 2px solid transparent;
-    }
-    .dish-grid-item:hover {
-      transform: translateY(-2px);
-      border-color: var(--red-light);
-    }
-    .dish-grid-item .em { font-size: 2rem; margin-bottom: 6px; }
-    .dish-grid-item .nm { font-size: 0.8rem; font-weight: 600; line-height: 1.3; }
-    .dish-grid-item .kr { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
-
-    .fridge-score {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .score-bar-bg {
-      flex: 1;
-      height: 6px;
-      background: var(--gray);
-      border-radius: 3px;
-      overflow: hidden;
-    }
-    .score-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--red-light), var(--red));
-      border-radius: 3px;
-      transition: width 0.4s ease;
-    }
-    .score-text { font-size: 0.78rem; color: var(--text-muted); white-space: nowrap; }
-
-    .no-results {
-      background: white;
-      border-radius: var(--radius);
-      padding: 30px 20px;
-      text-align: center;
-      color: var(--text-muted);
-      box-shadow: var(--shadow);
-    }
-    .no-results .icon { font-size: 2.5rem; margin-bottom: 10px; }
-
-    @media (max-width: 480px) {
-      header h1 { font-size: 1.5rem; }
-      .tab-btn { font-size: 0.75rem; padding: 11px 4px; }
-      .tab-btn .icon { font-size: 1.1rem; }
-    }
-  </style>
+/* ===== Modal (bottom sheet) ===== */
+#modalOverlay{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  background:rgba(0,0,0,.45);
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s;
+}
+#modalOverlay.show{opacity:1;pointer-events:auto}
+#modal{
+  position:relative;
+  background:#fff;
+  width:100%;
+  max-width:640px;
+  max-height:92vh;
+  max-height:92dvh;
+  border-radius:22px 22px 0 0;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  padding:0 20px calc(28px + env(safe-area-inset-bottom));
+  transform:translateY(40px);
+  transition:transform .3s ease,opacity .3s ease;
+}
+#modalOverlay.show #modal{transform:translateY(0)}
+@media(min-width:720px){
+  #modalOverlay{align-items:center;padding:24px}
+  #modal{border-radius:22px;max-height:86vh;padding-bottom:28px}
+}
+#modalHandleArea{
+  position:sticky;
+  top:0;
+  z-index:5;
+  background:#fff;
+  padding:10px 0 8px;
+  touch-action:pan-y;
+}
+.handle-bar{
+  width:44px;height:5px;
+  border-radius:999px;
+  background:#ddd;
+  margin:0 auto;
+}
+.modal-close{
+  position:sticky;
+  top:10px;
+  float:right;
+  z-index:6;
+  width:34px;height:34px;
+  border-radius:50%;
+  background:#f2f2f2;
+  color:#666;
+  font-size:.95rem;
+  display:flex;align-items:center;justify-content:center;
+}
+.modal-emoji{font-size:3.2rem;text-align:center;margin-top:4px}
+.modal-title{font-size:1.4rem;font-weight:800;text-align:center;margin-top:6px}
+.modal-korean{font-size:.95rem;color:var(--muted);text-align:center}
+.modal-desc{font-size:.88rem;color:var(--muted);text-align:center;margin:8px auto 0;max-width:440px}
+.modal-meta{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+  margin:18px 0;
+}
+@media(min-width:480px){.modal-meta{grid-template-columns:repeat(4,1fr)}}
+.meta-item{
+  background:var(--bg);
+  border-radius:12px;
+  padding:10px 6px;
+  text-align:center;
+  font-size:.8rem;
+  font-weight:700;
+}
+.meta-item span{display:block;font-size:1.1rem;margin-bottom:2px}
+.modal-section{margin-top:22px}
+.modal-section h3{
+  font-size:1rem;font-weight:800;
+  display:flex;align-items:center;gap:6px;
+  margin-bottom:12px;
+}
+.ingredients-grid{display:grid;grid-template-columns:1fr;gap:8px}
+@media(min-width:480px){.ingredients-grid{grid-template-columns:repeat(2,1fr)}}
+.ingredient-item{
+  display:flex;align-items:center;gap:8px;
+  background:#fafafa;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:9px 12px;
+  font-size:.88rem;
+}
+.dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.dot.main{background:var(--red)}
+.dot.sub{background:var(--orange)}
+.dot.sauce{background:#c9a227}
+.steps-list{list-style:none}
+.step-item{
+  display:flex;gap:12px;
+  align-items:flex-start;
+  padding:10px 0;
+  border-bottom:1px dashed var(--line);
+}
+.step-item:last-child{border-bottom:none}
+.step-num{
+  width:26px;height:26px;
+  flex-shrink:0;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--red),var(--orange));
+  color:#fff;
+  font-size:.8rem;
+  font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+  margin-top:1px;
+}
+.step-text{font-size:.9rem}
+.tip-box{
+  background:#fff8e8;
+  border:1.5px solid #f3dfa8;
+  border-radius:12px;
+  padding:14px;
+  font-size:.88rem;
+}
+@media(prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
 </head>
 <body>
 
-<header>
-  <h1>🇰🇷 韓国料理レシピ</h1>
-  <p>食材・料理名・冷蔵庫から韓国料理を探そう</p>
+<header class="app-header">
+  <div class="header-inner">
+    <h1>🇰🇷 韓国料理レシピ</h1>
+    <p>冷蔵庫の食材から作れる韓国料理を探そう！全60品</p>
+    <div class="mode-switch">
+      <button id="deskModeIng" class="mode-btn active" onclick="switchMode('ingredient')">🧊 食材から探す</button>
+      <button id="deskModeRec" class="mode-btn" onclick="switchMode('recipe')">📚 レシピ一覧</button>
+    </div>
+  </div>
 </header>
 
-<div class="tabs">
-  <button class="tab-btn active" onclick="switchTab('ingredient')">
-    <span class="icon">🥕</span>食材から<br>料理を探す
-  </button>
-  <button class="tab-btn" onclick="switchTab('recipe')">
-    <span class="icon">📖</span>料理名から<br>レシピを見る
-  </button>
-  <button class="tab-btn" onclick="switchTab('fridge')">
-    <span class="icon">🧊</span>冷蔵庫の<br>食材で提案
-  </button>
-</div>
+<main>
+  <!-- 食材から探すモード -->
+  <section id="ingredientMode">
+    <div class="search-card">
+      <h2 class="section-label">🧊 冷蔵庫にある食材は？</h2>
+      <div class="input-row">
+        <input id="ingredientInput" type="search" placeholder="例：豚肉、キムチ、豆腐…" autocomplete="off" enterkeyhint="done">
+        <button class="add-btn" onclick="addIngredient()">追加</button>
+      </div>
+      <div id="tagsArea" class="tags-area"></div>
+      <p class="quick-label">よく使う食材をタップして選択</p>
+      <div id="quickTags" class="quick-tags"></div>
+    </div>
+    <div id="ingredientResults"></div>
+  </section>
 
-<!-- TAB 1: 食材 → 料理 -->
-<div class="tab-panel active" id="tab-ingredient">
-  <div class="section-title">🥕 食材から韓国料理を探す</div>
-  <p class="hint-label">食材を入力してEnterまたは「追加」を押してください</p>
-  <div class="input-row">
-    <input type="text" id="ing-input" placeholder="例: 豚バラ、キムチ、豆腐..." onkeydown="if(event.key==='Enter')addIngredient()">
-    <button class="btn" onclick="addIngredient()">追加</button>
-  </div>
-  <div class="tag-area" id="ing-tags"></div>
-  <button class="btn btn-secondary" onclick="searchByIngredients()" style="width:100%">🔍 この食材で作れる料理を探す</button>
-  <div class="results" id="ing-results"></div>
-</div>
+  <!-- レシピ一覧モード -->
+  <section id="recipeMode" style="display:none">
+    <div class="search-card">
+      <h2 class="section-label">📚 レシピを検索</h2>
+      <div class="input-row">
+        <input id="recipeSearchInput" type="search" placeholder="料理名・韓国語・カテゴリで検索" autocomplete="off" enterkeyhint="search" oninput="searchByName()">
+      </div>
+    </div>
+    <div id="recipeResults"></div>
+  </section>
+</main>
 
-<!-- TAB 2: 料理名 → レシピ -->
-<div class="tab-panel" id="tab-recipe">
-  <div class="section-title">📖 料理名からレシピを見る</div>
-  <p class="hint-label">料理名（日本語または韓国語）を検索、またはリストから選択</p>
-  <div class="input-row">
-    <input type="text" id="recipe-input" placeholder="例: キムチチゲ、비빔밥..." oninput="filterDishGrid()" onkeydown="if(event.key==='Enter')searchRecipe()">
-    <button class="btn" onclick="searchRecipe()">検索</button>
-  </div>
-  <div id="dish-grid" class="dish-grid"></div>
-  <div class="results" id="recipe-results"></div>
-</div>
+<!-- 下部ナビ（スマホ用） -->
+<nav class="bottom-nav">
+  <button id="navIng" class="nav-btn active" onclick="switchMode('ingredient')"><span class="nav-icon">🧊</span>食材から</button>
+  <button id="navRec" class="nav-btn" onclick="switchMode('recipe')"><span class="nav-icon">📚</span>レシピ一覧</button>
+</nav>
 
-<!-- TAB 3: 冷蔵庫 → 提案 -->
-<div class="tab-panel" id="tab-fridge">
-  <div class="section-title">🧊 冷蔵庫の食材から料理を提案</div>
-  <p class="hint-label">今ある食材を登録すると、作れる料理を多い順に表示します</p>
-  <div class="input-row">
-    <input type="text" id="fridge-input" placeholder="冷蔵庫の食材を入力..." onkeydown="if(event.key==='Enter')addFridgeItem()">
-    <button class="btn" onclick="addFridgeItem()">追加</button>
+<button id="scrollTopBtn" aria-label="ページ上部へ" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- レシピ詳細モーダル -->
+<div id="modalOverlay">
+  <div id="modal" role="dialog" aria-modal="true">
+    <div id="modalHandleArea"><div class="handle-bar"></div></div>
+    <button class="modal-close" aria-label="閉じる" onclick="closeModal()">✕</button>
+    <div id="modalBody"></div>
   </div>
-  <div class="tag-area" id="fridge-tags"></div>
-  <div style="display:flex;gap:8px;margin-bottom:8px">
-    <button class="btn btn-secondary" onclick="suggestFromFridge()" style="flex:1">🍳 作れる料理を提案する</button>
-    <button class="btn" style="background:var(--gray);color:var(--text-muted)" onclick="clearFridge()">クリア</button>
-  </div>
-  <div class="results" id="fridge-results"></div>
 </div>
 
 <script>
-// ============================================================
-// RECIPE DATABASE
-// ============================================================
-const RECIPES = [
-  {
-    id: "kimchi-jjigae",
-    emoji: "🍲",
-    nameJp: "キムチチゲ",
-    nameKr: "김치찌개",
-    desc: "酸味と旨味が絶品！韓国の定番鍋料理",
-    time: "30分",
-    serving: "2人前",
-    difficulty: "★★☆",
-    ingredients: [
-      { name: "豚バラ肉", amount: "200g" },
-      { name: "キムチ", amount: "200g" },
-      { name: "木綿豆腐", amount: "1/2丁" },
-      { name: "ネギ", amount: "1本" },
-      { name: "にんにく", amount: "2片" },
-      { name: "ごま油", amount: "大さじ1" },
-      { name: "コチュジャン", amount: "大さじ1" },
-      { name: "醤油", amount: "小さじ1" },
-      { name: "だし（水）", amount: "400ml" },
-    ],
-    steps: [
-      "鍋にごま油を熱し、豚バラ肉を炒める。",
-      "肉の色が変わったらキムチを加えてさらに2分炒める。",
-      "水とだし（またはいりこだし）を加えて沸騰させる。",
-      "コチュジャン・醤油・みじん切りにんにくを加えて中火で10分煮る。",
-      "豆腐を角切りにして加え、さらに5分煮る。",
-      "ネギを斜め切りにして加え、ひと煮立ちさせたら完成。",
-    ],
-    tags: ["豚バラ肉", "キムチ", "豆腐", "ネギ", "にんにく", "ごま油", "コチュジャン"],
-  },
-  {
-    id: "bibimbap",
-    emoji: "🥣",
-    nameJp: "ビビンバ",
-    nameKr: "비빔밥",
-    desc: "カラフルな野菜と卵を混ぜて食べる韓国の代表料理",
-    time: "40分",
-    serving: "2人前",
-    difficulty: "★★☆",
-    ingredients: [
-      { name: "ご飯", amount: "2膳分" },
-      { name: "牛薄切り肉", amount: "100g" },
-      { name: "ほうれん草", amount: "1束" },
-      { name: "人参", amount: "1/2本" },
-      { name: "もやし", amount: "100g" },
-      { name: "干し椎茸", amount: "2枚" },
-      { name: "卵", amount: "2個" },
-      { name: "コチュジャン", amount: "大さじ2" },
-      { name: "ごま油", amount: "大さじ1" },
-      { name: "醤油", amount: "大さじ1" },
-    ],
-    steps: [
-      "干し椎茸を水で戻し、薄切りにする。",
-      "ほうれん草・もやし・人参・椎茸をそれぞれ茹でるか炒め、ごま油・塩で味付けする。",
-      "牛肉を醤油・砂糖・ごま油で下味をつけて炒める。",
-      "卵を目玉焼き（半熟）にする。",
-      "丼にご飯を盛り、具材を色よく並べる。",
-      "中央に目玉焼きをのせ、コチュジャンを添えてよく混ぜて食べる。",
-    ],
-    tags: ["ご飯", "牛肉", "ほうれん草", "人参", "もやし", "卵", "コチュジャン", "ごま油", "椎茸"],
-  },
-  {
-    id: "bulgogi",
-    emoji: "🥩",
-    nameJp: "プルコギ",
-    nameKr: "불고기",
-    desc: "甘辛タレに漬け込んだ牛肉の焼き肉",
-    time: "30分（漬け込み別）",
-    serving: "2人前",
-    difficulty: "★☆☆",
-    ingredients: [
-      { name: "牛肩ロース薄切り", amount: "300g" },
-      { name: "醤油", amount: "大さじ3" },
-      { name: "砂糖", amount: "大さじ2" },
-      { name: "にんにく", amount: "3片" },
-      { name: "ごま油", amount: "大さじ1" },
-      { name: "すりごま", amount: "大さじ1" },
-      { name: "玉ねぎ", amount: "1/2個" },
-      { name: "ネギ", amount: "1/2本" },
-      { name: "梨（または りんご）", amount: "1/4個（すりおろし）" },
-    ],
-    steps: [
-      "醤油・砂糖・おろしにんにく・ごま油・すりごま・梨のすりおろしを混ぜてタレを作る。",
-      "牛肉をタレに30分以上漬け込む。",
-      "玉ねぎを薄切り、ネギを斜め切りにする。",
-      "フライパンまたは鉄板を熱し、玉ねぎを炒めてから牛肉を加える。",
-      "強火でさっと炒め、ネギを加えてひと混ぜしたら完成。",
-    ],
-    tags: ["牛肉", "醤油", "にんにく", "ごま油", "玉ねぎ", "ネギ", "砂糖"],
-  },
-  {
-    id: "tteokbokki",
-    emoji: "🌶️",
-    nameJp: "トッポッキ",
-    nameKr: "떡볶이",
-    desc: "もちもち食感の辛い餅が癖になる屋台料理",
-    time: "20分",
-    serving: "2人前",
-    difficulty: "★☆☆",
-    ingredients: [
-      { name: "トック（韓国餅）", amount: "300g" },
-      { name: "コチュジャン", amount: "大さじ3" },
-      { name: "砂糖", amount: "大さじ1" },
-      { name: "醤油", amount: "小さじ1" },
-      { name: "ちくわ", amount: "2本" },
-      { name: "玉ねぎ", amount: "1/2個" },
-      { name: "ネギ", amount: "1/2本" },
-      { name: "だし（いりこ）", amount: "400ml" },
-    ],
-    steps: [
-      "いりこだしを鍋で煮立て、コチュジャン・砂糖・醤油を溶かす。",
-      "玉ねぎを薄切り、ちくわを斜め切りにする。",
-      "トックを鍋に加えて中火で5分煮る。",
-      "玉ねぎ・ちくわを加えてさらに5分、タレが絡むまで煮詰める。",
-      "ネギを散らして完成。お好みで茹で卵をトッピング。",
-    ],
-    tags: ["トック", "コチュジャン", "砂糖", "ちくわ", "玉ねぎ", "ネギ"],
-  },
-  {
-    id: "doenjang-jjigae",
-    emoji: "🫕",
-    nameJp: "テンジャンチゲ",
-    nameKr: "된장찌개",
-    desc: "韓国風味噌汁。深いコクと香りの家庭の味",
-    time: "25分",
-    serving: "2人前",
-    difficulty: "★☆☆",
-    ingredients: [
-      { name: "木綿豆腐", amount: "1/2丁" },
-      { name: "じゃがいも", amount: "1個" },
-      { name: "玉ねぎ", amount: "1/2個" },
-      { name: "ズッキーニ（またはなす）", amount: "1/2本" },
-      { name: "テンジャン（韓国味噌）", amount: "大さじ2" },
-      { name: "コチュジャン", amount: "小さじ1" },
-      { name: "にんにく", amount: "2片" },
-      { name: "いりこだし", amount: "400ml" },
-      { name: "ネギ", amount: "1/2本" },
-    ],
-    steps: [
-      "じゃがいもを1.5cm角に切り、玉ねぎは粗めのざく切りにする。",
-      "いりこだしを鍋で沸かし、テンジャンとコチュジャンを溶く。",
-      "じゃがいもと玉ねぎを加えて5分煮る。",
-      "豆腐・ズッキーニ・おろしにんにくを加えてさらに5分煮る。",
-      "ネギを散らして完成。",
-    ],
-    tags: ["豆腐", "じゃがいも", "玉ねぎ", "テンジャン", "にんにく", "ネギ", "ズッキーニ"],
-  },
-  {
-    id: "samgyeopsal",
-    emoji: "🥓",
-    nameJp: "サムギョプサル",
-    nameKr: "삼겹살",
-    desc: "厚切り豚バラをサンチュで包んで食べる韓国BBQ",
-    time: "20分",
-    serving: "2人前",
-    difficulty: "★☆☆",
-    ingredients: [
-      { name: "豚バラ肉（厚切り）", amount: "300g" },
-      { name: "にんにく", amount: "1片" },
-      { name: "サンチュ", amount: "適量" },
-      { name: "ごま油", amount: "大さじ1" },
-      { name: "塩", amount: "少々" },
-      { name: "コチュジャン", amount: "適量" },
-      { name: "ネギ", amount: "1本" },
-    ],
-    steps: [
-      "豚バラ肉を3cm幅に切る。",
-      "鉄板またはフライパンを強火で熱し、豚バラを並べて焼く。",
-      "両面に焼き色がついたら食べやすい大きさに切る。",
-      "にんにくも一緒に焼く。",
-      "ごま油に塩を混ぜたタレを作る。",
-      "サンチュに肉・にんにく・コチュジャン・ネギをのせて包んで食べる。",
-    ],
-    tags: ["豚バラ肉", "にんにく", "サンチュ", "ごま油", "コチュジャン", "ネギ"],
-  },
-  {
-    id: "sundubu",
-    emoji: "🍳",
-    nameJp: "スンドゥブチゲ",
-    nameKr: "순두부찌개",
-    desc: "絹ごし豆腐の辛い鍋。卵を落として食べる",
-    time: "25分",
-    serving: "2人前",
-    difficulty: "★★☆",
-    ingredients: [
-      { name: "絹ごし豆腐", amount: "1丁" },
-      { name: "あさり（または豚ひき肉）", amount: "100g" },
-      { name: "卵", amount: "2個" },
-      { name: "コチュジャン", amount: "大さじ1" },
-      { name: "粉唐辛子", amount: "大さじ1" },
-      { name: "にんにく", amount: "2片" },
-      { name: "ごま油", amount: "大さじ1" },
-      { name: "だし", amount: "300ml" },
-      { name: "ネギ", amount: "1/2本" },
-    ],
-    steps: [
-      "鍋にごま油・粉唐辛子を入れて弱火で香りを出す。",
-      "おろしにんにく・コチュジャンを加えて炒める。",
-      "だし（あさりを使う場合はそのまま）を加えて沸騰させる。",
-      "あさり（または豚ひき肉）を加えて3分煮る。",
-      "豆腐をスプーンですくって加える。",
-      "煮立ったら卵を割り入れ、半熟になったらネギをちらして完成。",
-    ],
-    tags: ["豆腐", "あさり", "卵", "コチュジャン", "にんにく", "ごま油", "ネギ"],
-  },
-  {
-    id: "japchae",
-    emoji: "🍜",
-    nameJp: "チャプチェ",
-    nameKr: "잡채",
-    desc: "春雨と野菜・肉の甘辛炒め。おもてなしの定番",
-    time: "35分",
-    serving: "3人前",
-    difficulty: "★★★",
-    ingredients: [
-      { name: "春雨（韓国春雨）", amount: "100g" },
-      { name: "牛薄切り肉", amount: "100g" },
-      { name: "ほうれん草", amount: "1/2束" },
-      { name: "人参", amount: "1/3本" },
-      { name: "干し椎茸", amount: "2枚" },
-      { name: "玉ねぎ", amount: "1/2個" },
-      { name: "醤油", amount: "大さじ3" },
-      { name: "砂糖", amount: "大さじ1.5" },
-      { name: "ごま油", amount: "大さじ2" },
-      { name: "にんにく", amount: "2片" },
-    ],
-    steps: [
-      "春雨を熱湯で茹で、水気を切って醤油・ごま油で和える。",
-      "牛肉を醤油・砂糖・にんにくで下味をつける。",
-      "野菜類（人参・椎茸・玉ねぎ）を千切りにし、それぞれ炒める。",
-      "ほうれん草は茹でて水気を絞り、ごま油・塩で和える。",
-      "フライパンで牛肉を炒め、春雨・全ての野菜を加える。",
-      "醤油・砂糖・ごま油で味を整え、全体を炒め合わせたら完成。",
-    ],
-    tags: ["春雨", "牛肉", "ほうれん草", "人参", "椎茸", "玉ねぎ", "ごま油", "醤油", "にんにく"],
-  },
-  {
-    id: "pajeon",
-    emoji: "🥞",
-    nameJp: "パジョン（ネギチヂミ）",
-    nameKr: "파전",
-    desc: "ネギたっぷりのサクサク韓国風チヂミ",
-    time: "20分",
-    serving: "2人前",
-    difficulty: "★☆☆",
-    ingredients: [
-      { name: "ネギ", amount: "3〜4本" },
-      { name: "小麦粉", amount: "1カップ" },
-      { name: "卵", amount: "1個" },
-      { name: "水", amount: "3/4カップ" },
-      { name: "えび（またはイカ）", amount: "50g" },
-      { name: "ごま油", amount: "大さじ1" },
-      { name: "塩", amount: "少々" },
-    ],
-    steps: [
-      "小麦粉・卵・水・塩を混ぜて生地を作る。",
-      "ネギを4cm長さに切る。えびは半分に切る。",
-      "フライパンにごま油を熱し、ネギを並べる。",
-      "生地を流し入れ、えびをのせる。",
-      "弱中火で片面3〜4分焼き、裏返してもう3分焼く。",
-      "タレ（醤油・酢・ごま油・一味）を添えて完成。",
-    ],
-    tags: ["ネギ", "小麦粉", "卵", "えび", "ごま油"],
-  },
-  {
-    id: "galbi",
-    emoji: "🦴",
-    nameJp: "カルビ",
-    nameKr: "갈비",
-    desc: "甘辛タレで漬け込んだ牛カルビの焼き肉",
-    time: "30分（漬け込み別）",
-    serving: "2人前",
-    difficulty: "★★☆",
-    ingredients: [
-      { name: "牛カルビ", amount: "400g" },
-      { name: "醤油", amount: "大さじ4" },
-      { name: "砂糖", amount: "大さじ2" },
-      { name: "にんにく", amount: "4片" },
-      { name: "ごま油", amount: "大さじ1" },
-      { name: "梨（またはりんご）", amount: "1/4個" },
-      { name: "玉ねぎ", amount: "1/2個" },
-      { name: "ネギ", amount: "1本" },
-      { name: "すりごま", amount: "大さじ1" },
-    ],
-    steps: [
-      "梨と玉ねぎをすりおろしてタレの材料と混ぜる。",
-      "牛カルビに切り込みを入れてタレに2時間以上漬け込む。",
-      "グリルまたは鉄板を強火で熱する。",
-      "カルビを並べ、両面を焼いて焦げ目をつける。",
-      "食べやすい大きさに切って盛り付けたら完成。",
-    ],
-    tags: ["牛肉", "醤油", "砂糖", "にんにく", "ごま油", "玉ねぎ", "ネギ"],
-  },
-  {
-    id: "samgyetang",
-    emoji: "🍗",
-    nameJp: "サムゲタン",
-    nameKr: "삼계탕",
-    desc: "丸鶏ともち米を煮込んだ滋養強壮スープ",
-    time: "90分",
-    serving: "2人前",
-    difficulty: "★★★",
-    ingredients: [
-      { name: "丸鶏（小）", amount: "1羽" },
-      { name: "もち米", amount: "1/4カップ" },
-      { name: "にんにく", amount: "4片" },
-      { name: "高麗人参", amount: "1本" },
-      { name: "ナツメ", amount: "3個" },
-      { name: "ネギ", amount: "1本" },
-      { name: "塩", amount: "適量" },
-      { name: "こしょう", amount: "少々" },
-    ],
-    steps: [
-      "もち米を洗って30分浸水させる。",
-      "丸鶏の腹にもち米・にんにく1片・ナツメを詰めて楊枝でとめる。",
-      "鍋に鶏・高麗人参・にんにく・ナツメ・水2Lを入れる。",
-      "強火で沸騰させてアクを取り、弱火で60〜90分煮込む。",
-      "鶏が柔らかくなったら塩・こしょうで味を整える。",
-      "ネギを散らして完成。",
-    ],
-    tags: ["鶏肉", "もち米", "にんにく", "ネギ"],
-  },
-  {
-    id: "jeyuk-bokkeum",
-    emoji: "🌶️",
-    nameJp: "チェユクボックム（豚肉の辛炒め）",
-    nameKr: "제육볶음",
-    desc: "コチュジャンベースの辛い豚肉炒め。ご飯が進む！",
-    time: "25分",
-    serving: "2人前",
-    difficulty: "★★☆",
-    ingredients: [
-      { name: "豚バラ肉（または肩ロース）", amount: "250g" },
-      { name: "コチュジャン", amount: "大さじ2" },
-      { name: "醤油", amount: "大さじ1" },
-      { name: "砂糖", amount: "大さじ1" },
-      { name: "にんにく", amount: "2片" },
-      { name: "生姜", amount: "1片" },
-      { name: "ごま油", amount: "大さじ1" },
-      { name: "玉ねぎ", amount: "1/2個" },
-      { name: "ネギ", amount: "1本" },
-      { name: "キャベツ", amount: "適量（付け合わせ）" },
-    ],
-    steps: [
-      "豚肉を食べやすい大きさに切る。",
-      "コチュジャン・醤油・砂糖・おろしにんにく・おろし生姜を混ぜてタレを作る。",
-      "豚肉にタレを揉み込んで10分置く。",
-      "フライパンを熱し、玉ねぎを炒めてから豚肉を加える。",
-      "強火で炒めながら味を絡め、ネギを加えてひと混ぜ。",
-      "ごま油を回しかけて完成。キャベツの千切りを添える。",
-    ],
-    tags: ["豚バラ肉", "コチュジャン", "醤油", "にんにく", "生姜", "ごま油", "玉ねぎ", "ネギ", "キャベツ"],
-  },
-  {
-    id: "haemul-pajeon",
-    emoji: "🦐",
-    nameJp: "ヘムルパジョン（海鮮チヂミ）",
-    nameKr: "해물파전",
-    desc: "えびやイカ入りのサクサク海鮮チヂミ",
-    time: "25分",
-    serving: "2人前",
-    difficulty: "★★☆",
-    ingredients: [
-      { name: "えび", amount: "6尾" },
-      { name: "イカ", amount: "1/2杯" },
-      { name: "ネギ", amount: "3本" },
-      { name: "小麦粉", amount: "1カップ" },
-      { name: "片栗粉", amount: "大さじ2" },
-      { name: "卵", amount: "2個" },
-      { name: "水", amount: "3/4カップ" },
-      { name: "ごま油", amount: "大さじ2" },
-    ],
-    steps: [
-      "えびの殻を剥き、イカを細切りにする。",
-      "小麦粉・片栗粉・卵・水・塩を混ぜて生地を作る。",
-      "フライパンにごま油を熱し、ネギを並べる。",
-      "生地を流し入れ、えびとイカをのせる。",
-      "弱中火で片面4〜5分、裏返してさらに3分焼く。",
-      "タレ（醤油・酢・ごま油）を添えて完成。",
-    ],
-    tags: ["えび", "イカ", "ネギ", "小麦粉", "卵", "ごま油", "片栗粉"],
-  },
-  {
-    id: "dak-galbi",
-    emoji: "🍖",
-    nameJp: "タッカルビ",
-    nameKr: "닭갈비",
-    desc: "鶏肉と野菜のコチュジャン炒め。チーズトッピングも人気",
-    time: "30分",
-    serving: "2人前",
-    difficulty: "★★☆",
-    ingredients: [
-      { name: "鶏もも肉", amount: "300g" },
-      { name: "キャベツ", amount: "1/4個" },
-      { name: "玉ねぎ", amount: "1/2個" },
-      { name: "さつまいも", amount: "1/2本" },
-      { name: "トック（韓国餅）", amount: "100g" },
-      { name: "コチュジャン", amount: "大さじ3" },
-      { name: "醤油", amount: "大さじ1" },
-      { name: "砂糖", amount: "大さじ1" },
-      { name: "にんにく", amount: "3片" },
-      { name: "ごま油", amount: "大さじ1" },
-    ],
-    steps: [
-      "鶏肉を一口大に切り、コチュジャン・醤油・砂糖・にんにく・ごま油でタレを作り漬け込む。",
-      "さつまいもは1cm厚の輪切りに、キャベツは大きめに切る。",
-      "鉄板またはフライパンにごま油を熱し、さつまいもから炒める。",
-      "鶏肉・玉ねぎ・トックを加えて炒め合わせる。",
-      "最後にキャベツを加えてさっと炒め、完成。",
-    ],
-    tags: ["鶏肉", "キャベツ", "玉ねぎ", "コチュジャン", "にんにく", "ごま油", "トック"],
-  },
-  {
-    id: "yangnyeom-chicken",
-    emoji: "🍗",
-    nameJp: "ヤンニョムチキン",
-    nameKr: "양념치킨",
-    desc: "甘辛ソースが絡んだ韓国フライドチキン",
-    time: "40分",
-    serving: "2人前",
-    difficulty: "★★☆",
-    ingredients: [
-      { name: "鶏もも肉（または手羽）", amount: "400g" },
-      { name: "コチュジャン", amount: "大さじ3" },
-      { name: "ケチャップ", amount: "大さじ2" },
-      { name: "はちみつ", amount: "大さじ2" },
-      { name: "にんにく", amount: "3片" },
-      { name: "醤油", amount: "大さじ1" },
-      { name: "片栗粉", amount: "1/2カップ" },
-      { name: "揚げ油", amount: "適量" },
-    ],
-    steps: [
-      "鶏肉に塩・こしょうをして片栗粉をまぶす。",
-      "170℃の油で7〜8分揚げ、取り出す。",
-      "190℃に上げてもう一度2分揚げ（二度揚げでサクサクに）。",
-      "コチュジャン・ケチャップ・はちみつ・醤油・おろしにんにくを混ぜてソースを作る。",
-      "小鍋でソースを温め、揚げた鶏肉を絡める。",
-      "ごまを散らして完成。",
-    ],
-    tags: ["鶏肉", "コチュジャン", "はちみつ", "にんにく", "醤油", "片栗粉"],
-  },
-  {
-    id: "gamjatang",
-    emoji: "🦴",
-    nameJp: "カムジャタン",
-    nameKr: "감자탕",
-    desc: "豚背骨とじゃがいもの旨味たっぷり辛いスープ",
-    time: "60分",
-    serving: "3人前",
-    difficulty: "★★★",
-    ingredients: [
-      { name: "豚背骨", amount: "600g" },
-      { name: "じゃがいも", amount: "2個" },
-      { name: "コチュジャン", amount: "大さじ2" },
-      { name: "粉唐辛子", amount: "大さじ2" },
-      { name: "にんにく", amount: "4片" },
-      { name: "生姜", amount: "1片" },
-      { name: "テンジャン", amount: "大さじ1" },
-      { name: "ネギ", amount: "1本" },
-      { name: "ごま油", amount: "大さじ1" },
-    ],
-    steps: [
-      "豚背骨を30分水に浸してアク抜きする。",
-      "熱湯で下茹でして取り出し、水で洗う。",
-      "鍋に豚背骨と水1.5Lを入れて沸騰させ、アクを取る。",
-      "コチュジャン・粉唐辛子・テンジャン・にんにく・生姜を加えて30分煮る。",
-      "じゃがいもを半分に切って加え、さらに20分煮る。",
-      "ネギを散らし、ごま油を回しかけて完成。",
-    ],
-    tags: ["豚肉", "じゃがいも", "コチュジャン", "にんにく", "生姜", "ごま油", "ネギ"],
-  },
+const recipes=[
+{id:1,name:"キムチチゲ",korean:"김치찌개",emoji:"🍲",desc:"韓国の定番！発酵キムチの旨みたっぷりの辛い鍋料理",category:"チゲ・鍋",level:"初級",time:"25分",servings:"2人分",mainIngredients:["キムチ","豚肉","豆腐"],subIngredients:["長ネギ","玉ねぎ"],seasonings:["コチュジャン","ごま油","にんにく","醤油"],steps:["豚肉は一口大、豆腐はさいの目に切る。","鍋にごま油を熱し豚肉を炒め、にんにくで香りを出す。","キムチを加えて2〜3分炒める。","水400ml・コチュジャン・醤油を入れて10分煮る。","豆腐と長ネギを加えて5分煮込んで完成！"],tip:"古くて酸っぱいキムチの方が美味しい。卵を落とすのもおすすめ！"},
+{id:2,name:"ビビンバ",korean:"비빔밥",emoji:"🍚",desc:"彩りナムルと肉をご飯に乗せてコチュジャンで混ぜる人気料理",category:"ご飯もの",level:"中級",time:"40分",servings:"2人分",mainIngredients:["ご飯","牛肉","卵"],subIngredients:["ほうれん草","もやし","にんじん","ズッキーニ"],seasonings:["コチュジャン","ごま油","醤油","にんにく","ごま"],steps:["野菜を茹でてごま油・塩・ごまで和えナムルを作る。","にんじんとズッキーニは千切りにして炒める。","牛肉は下味をつけて炒める。","丼にご飯・ナムル・肉を盛り卵黄を乗せる。","コチュジャンを添えてよく混ぜて食べる！"],tip:"石鍋にごま油を塗るとおこげができて最高。"},
+{id:3,name:"チーズタッカルビ",korean:"치즈닭갈비",emoji:"🧀",desc:"甘辛い鶏肉ととろ〜りチーズが最高！若者に大人気",category:"メイン",level:"初級",time:"30分",servings:"2人分",mainIngredients:["鶏肉","チーズ","キャベツ"],subIngredients:["さつまいも","玉ねぎ","長ネギ","トッポギ"],seasonings:["コチュジャン","醤油","にんにく","砂糖","ごま油"],steps:["鶏もも肉をタレで下味をつけ15分おく。","野菜を切る。","フライパンに野菜を敷き鶏肉をのせ15分蒸し焼き。","中央を空けてチーズをたっぷり入れる。","チーズが溶けたら具材を絡めて食べる！"],tip:"モッツァレラだとよく伸びる。シメにご飯を入れてリゾット風も◎"},
+{id:4,name:"チヂミ",korean:"전/부침개",emoji:"🥞",desc:"カリッともちっと！野菜たっぷりの韓国風お好み焼き",category:"軽食・おつまみ",level:"初級",time:"20分",servings:"2枚分",mainIngredients:["小麦粉","卵","ニラ"],subIngredients:["玉ねぎ","にんじん","イカ","エビ"],seasonings:["醤油","酢","ごま油","塩"],steps:["小麦粉・片栗粉・水・卵・塩で生地を作る。","ニラ・玉ねぎ・にんじんを生地に混ぜる。","ごま油を多めに熱し生地を薄く広げて焼く。","裏返して両面こんがり焼く。","醤油・酢・ごま油のタレで食べる！"],tip:"片栗粉がカリカリのコツ！油は惜しまず使ってね。"},
+{id:5,name:"スンドゥブチゲ",korean:"순두부찌개",emoji:"🫕",desc:"ぷるぷる柔らか豆腐がたまらない辛くて優しいスープ",category:"チゲ・鍋",level:"初級",time:"20分",servings:"1人分",mainIngredients:["豆腐","卵","あさり"],subIngredients:["長ネギ","しいたけ","キムチ"],seasonings:["コチュジャン","粉唐辛子","にんにく","ごま油","醤油"],steps:["鍋にごま油を熱しにんにくと粉唐辛子を炒める。","あさりとキムチを炒め水300mlを注ぐ。","絹豆腐をすくって入れしいたけ・長ネギも加える。","味を整え5分煮込む。","卵を割り入れ半熟で火を止めて完成！"],tip:"あさりがなければ豚肉やシーフードミックスでもOK！"},
+{id:6,name:"トッポギ",korean:"떡볶이",emoji:"🍡",desc:"もちもち韓国餅を甘辛ソースで煮込んだ国民的おやつ",category:"軽食・おつまみ",level:"初級",time:"15分",servings:"2人分",mainIngredients:["トッポギ","コチュジャン"],subIngredients:["ゆで卵","長ネギ","キャベツ","さつま揚げ"],seasonings:["砂糖","醤油","にんにく","粉唐辛子"],steps:["餅は水にくぐらせる。","鍋に水・コチュジャン・砂糖・醤油を入れ火にかける。","トッポギ・さつま揚げ・キャベツを煮る。","とろみがついたら長ネギを加える。","ゆで卵を添えて完成！"],tip:"チーズを加えると辛さがマイルドに！"},
+{id:7,name:"プルコギ",korean:"불고기",emoji:"🥩",desc:"甘めの醤油ダレで漬けた柔らか牛肉。大人気の韓国焼肉",category:"メイン",level:"初級",time:"30分",servings:"2人分",mainIngredients:["牛肉","玉ねぎ"],subIngredients:["にんじん","長ネギ","しいたけ","もやし"],seasonings:["醤油","砂糖","にんにく","ごま油","ごま","梨"],steps:["牛肉は薄切りで食べやすく切る。","タレを作る。","牛肉を20分以上漬ける。","野菜と一緒に炒める。","ごまを振って完成！サンチュに包んでも◎"],tip:"梨がなければりんごやキウイで代用OK。肉が柔らかくなる！"},
+{id:8,name:"サムギョプサル",korean:"삼겹살",emoji:"🥓",desc:"厚切り豚バラを焼いて野菜で包む韓国式BBQ",category:"メイン",level:"初級",time:"25分",servings:"2人分",mainIngredients:["豚バラ肉","サンチュ","にんにく"],subIngredients:["大葉","長ネギ","キムチ","玉ねぎ"],seasonings:["サムジャン","ごま油","塩","コショウ"],steps:["豚バラ肉は厚切りにする。","サンチュを洗いにんにくは薄切り。","強火で豚バラをじっくり焼く。","キッチンバサミで一口大にカット。","サンチュに包んで食べる！"],tip:"味噌＋コチュジャン＋ごま油でサムジャンの代用に。"},
+{id:9,name:"ヤンニョムチキン",korean:"양념치킨",emoji:"🍗",desc:"カリカリチキンに甘辛ソースを絡めた中毒性MAXの一品",category:"メイン",level:"中級",time:"40分",servings:"2人分",mainIngredients:["鶏肉","片栗粉"],subIngredients:["卵"],seasonings:["コチュジャン","ケチャップ","砂糖","にんにく","醤油","ごま"],steps:["鶏もも肉を切り塩コショウで下味。","片栗粉をまぶし二度揚げでカリカリに。","ソースを加熱する。","チキンをソースに絡める。","ごまを振って完成！🍺"],tip:"二度揚げがカリカリの秘訣！"},
+{id:10,name:"ナムル",korean:"나물",emoji:"🥗",desc:"野菜をごま油で和えた韓国の基本副菜。作り置きに最適",category:"副菜",level:"初級",time:"15分",servings:"2人分",mainIngredients:["もやし","ほうれん草"],subIngredients:["にんじん","ズッキーニ","大根"],seasonings:["ごま油","にんにく","塩","ごま","醤油"],steps:["もやしを2分茹でて水気を絞る。","ほうれん草も茹でて5cm幅に切る。","ごま油・にんにく・塩・ごまで和える。","にんじんは千切りにして炒め同様に味付け。","冷蔵庫で3日保存可能！"],tip:"水気をしっかり絞るのがポイント。"},
+{id:11,name:"チャプチェ",korean:"잡채",emoji:"🍜",desc:"春雨と野菜を甘辛く炒めた人気おかず",category:"副菜",level:"中級",time:"35分",servings:"3人分",mainIngredients:["春雨","牛肉","ほうれん草"],subIngredients:["にんじん","玉ねぎ","しいたけ","パプリカ"],seasonings:["醤油","砂糖","ごま油","にんにく","ごま"],steps:["春雨を茹でて切る。","牛肉を下味つけて炒める。","野菜を別々に炒める。","全て醤油・砂糖・ごま油で和える。","ごまを振って完成！"],tip:"具材を別々に炒めると仕上がりが全然違います。"},
+{id:12,name:"キンパ",korean:"김밥",emoji:"🍙",desc:"韓国風海苔巻き。お弁当やピクニックの定番",category:"ご飯もの",level:"中級",time:"40分",servings:"2本分",mainIngredients:["ご飯","海苔","卵"],subIngredients:["にんじん","ほうれん草","たくあん","カニカマ","牛肉"],seasonings:["ごま油","塩","醤油","砂糖","ごま"],steps:["ご飯にごま油と塩を混ぜて冷ます。","卵は薄焼き。野菜はナムルにする。","牛肉は甘辛く炒める。","海苔にご飯を広げ具材を巻く。","ごま油を塗り切って完成！"],tip:"ご飯を薄く、具材を手前に集中させるのがコツ。"},
+{id:13,name:"サムゲタン",korean:"삼계탕",emoji:"🐔",desc:"鶏にもち米を詰めてじっくり煮込んだ滋養スープ",category:"スープ",level:"上級",time:"120分",servings:"2人分",mainIngredients:["鶏肉","もち米","長ネギ"],subIngredients:["なつめ","にんにく","生姜"],seasonings:["塩","コショウ","ごま油"],steps:["もち米は30分水に浸ける。","鶏肉を洗う。","全材料と水を入れ1.5〜2時間煮込む。","アクを取りながら煮る。","塩コショウで味を整えて完成！"],tip:"手羽元でも十分美味しい。夏バテ対策にぴったり！"},
+{id:14,name:"テンジャンチゲ",korean:"된장찌개",emoji:"🫕",desc:"韓国味噌で作る家庭の味。ホッとする優しいチゲ",category:"チゲ・鍋",level:"初級",time:"20分",servings:"2人分",mainIngredients:["味噌","豆腐","ズッキーニ"],subIngredients:["玉ねぎ","長ネギ","しいたけ","じゃがいも"],seasonings:["にんにく","粉唐辛子","ごま油"],steps:["豆腐はさいの目、ズッキーニは半月切り。","出汁に味噌を溶く。","じゃがいも・玉ねぎを5分煮る。","豆腐・ズッキーニ・しいたけを加え5〜7分煮込む。","長ネギと粉唐辛子を加えて完成！"],tip:"日本の合わせ味噌でも代用OK。"},
+{id:15,name:"タッカンマリ",korean:"닭한마리",emoji:"🍲",desc:"鶏をじっくり煮込んだソウルの名物鍋料理",category:"チゲ・鍋",level:"中級",time:"60分",servings:"3人分",mainIngredients:["鶏肉","じゃがいも","長ネギ"],subIngredients:["トッポギ","にんにく","玉ねぎ"],seasonings:["塩","コショウ","酢","からし","醤油"],steps:["鶏もも肉を大きめに切り血抜き。","鍋に鶏肉・にんにく・長ネギ・水を入れ沸騰。","弱火で30分煮込む。","じゃがいもを加え15分煮る。","酢醤油＋からしで食べる！"],tip:"シメにうどんを入れるのがおすすめ。"},
+{id:16,name:"ユッケジャン",korean:"육개장",emoji:"🥘",desc:"牛肉と野菜の辛口スープ。スタミナ満点",category:"スープ",level:"中級",time:"50分",servings:"2人分",mainIngredients:["牛肉","もやし","長ネギ"],subIngredients:["ワラビ","卵"],seasonings:["粉唐辛子","にんにく","醤油","ごま油","塩"],steps:["牛肉を茹でて裂く。","もやしと長ネギを準備。","茹で汁に調味料を加える。","肉と野菜を15分煮込む。","溶き卵を回し入れ完成！"],tip:"二日酔いの朝にも最高のスープ！"},
+{id:17,name:"ポッサム",korean:"보쌈",emoji:"🐷",desc:"柔らかく茹でた豚肉を野菜で包んで食べるヘルシー料理",category:"メイン",level:"中級",time:"90分",servings:"3人分",mainIngredients:["豚バラ肉","サンチュ","キムチ"],subIngredients:["大葉","にんにく","長ネギ"],seasonings:["味噌","生姜","コショウ","サムジャン"],steps:["豚バラ塊を長ネギ・生姜と60分茹でる。","アクを取り竹串が通るまで煮る。","休ませて薄くスライス。","サンチュ・キムチを盛り付ける。","包んで食べる！"],tip:"コーラを少し入れると肉が柔らかくなる裏技も。"},
+{id:18,name:"カムジャタン",korean:"감자탕",emoji:"🥔",desc:"豚とじゃがいものピリ辛スープ。ボリューム満点",category:"チゲ・鍋",level:"中級",time:"60分",servings:"3人分",mainIngredients:["豚肉","じゃがいも","長ネギ"],subIngredients:["白菜","えのき","大根"],seasonings:["コチュジャン","粉唐辛子","にんにく","醤油","味噌","ごま油"],steps:["豚スペアリブを血抜きし茹でこぼす。","水・にんにく・生姜で30分煮込む。","じゃがいも・大根を加える。","タレで味付けし15分煮込む。","白菜・えのき・長ネギを加えて完成！"],tip:"翌日の方が味が染みて美味しい！"},
+{id:19,name:"冷麺",korean:"냉면",emoji:"🍜",desc:"冷たいスープにもちもち麺。夏の定番",category:"麺",level:"初級",time:"15分",servings:"1人分",mainIngredients:["冷麺","きゅうり","卵"],subIngredients:["梨","大根","牛肉","キムチ"],seasonings:["酢","からし","砂糖","醤油","塩"],steps:["麺を茹でて冷水で洗う。","スープを冷やす。","具材を切る。","麺にスープを注ぎ具材を盛る。","酢とからしを加えて完成！"],tip:"スープは前日からキンキンに冷やしておくのがベスト。"},
+{id:20,name:"ジャージャー麺",korean:"짜장면",emoji:"🍝",desc:"韓国式黒味噌炸醤麺。甘めの黒ソースが絶品",category:"麺",level:"中級",time:"30分",servings:"2人分",mainIngredients:["中華麺","豚肉","玉ねぎ"],subIngredients:["ズッキーニ","じゃがいも","キャベツ","きゅうり"],seasonings:["チュンジャン","砂糖","片栗粉","ごま油"],steps:["豚肉・野菜をさいの目に切る。","チュンジャンを炒めて苦味を飛ばす。","豚肉・野菜を炒める。","水と砂糖を加えとろみをつける。","麺にソースをかけきゅうりを添えて完成！"],tip:"甜麺醤で代用可能。"},
+{id:21,name:"韓国風海鮮チヂミ",korean:"해물파전",emoji:"🦐",desc:"ネギとシーフードたっぷりの贅沢チヂミ",category:"軽食・おつまみ",level:"中級",time:"25分",servings:"2枚分",mainIngredients:["小麦粉","長ネギ","イカ"],subIngredients:["エビ","卵","あさり"],seasonings:["醤油","酢","ごま油","塩"],steps:["生地を作る。","長ネギを並べシーフードを散らす。","生地を流し入れ焼く。","裏返して両面焼く。","酢醤油で食べる！"],tip:"雨の日にチヂミを食べるのが韓国の習慣。マッコリと最高！"},
+{id:22,name:"タッカルビ",korean:"닭갈비",emoji:"🍗",desc:"甘辛ダレで炒めた鶏肉と野菜の鉄板料理",category:"メイン",level:"初級",time:"30分",servings:"2人分",mainIngredients:["鶏肉","キャベツ","さつまいも"],subIngredients:["玉ねぎ","長ネギ","トッポギ"],seasonings:["コチュジャン","粉唐辛子","醤油","砂糖","にんにく","ごま油"],steps:["鶏もも肉をタレで下味。","野菜を切る。","野菜を敷き鶏肉を乗せる。","蓋をして15分蒸し焼き。","混ぜて炒めて完成！"],tip:"シメにご飯を入れても◎"},
+{id:23,name:"ケランチム",korean:"계란찜",emoji:"🥚",desc:"ふわふわの韓国風茶碗蒸し",category:"副菜",level:"初級",time:"15分",servings:"2人分",mainIngredients:["卵","長ネギ"],subIngredients:["にんじん"],seasonings:["塩","ごま油","だしの素"],steps:["卵を溶き水・塩・だしの素を加える。","鍋に入れ中火にかける。","長ネギを散らしかき混ぜる。","蓋をして3〜4分蒸す。","ごま油を垂らして完成！"],tip:"ぐつぐつ煮るのが韓国流。"},
+{id:24,name:"キムチチャーハン",korean:"김치볶음밥",emoji:"🍳",desc:"余ったキムチとご飯で作る定番チャーハン",category:"ご飯もの",level:"初級",time:"10分",servings:"1人分",mainIngredients:["ご飯","キムチ","卵"],subIngredients:["豚肉","長ネギ","チーズ"],seasonings:["ごま油","醤油","コチュジャン"],steps:["ごま油で豚肉を炒める。","キムチを炒める。","ご飯を加えパラパラに炒める。","目玉焼きを乗せる。","チーズをトッピングして完成！"],tip:"酸っぱいキムチが最高に合う。"},
+{id:25,name:"トゥブジョリム",korean:"두부조림",emoji:"🫘",desc:"豆腐を甘辛タレで煮込んだご飯がすすむおかず",category:"副菜",level:"初級",time:"20分",servings:"2人分",mainIngredients:["豆腐","長ネギ"],subIngredients:["玉ねぎ"],seasonings:["醤油","コチュジャン","粉唐辛子","にんにく","砂糖","ごま油","ごま"],steps:["豆腐を1cm厚さに切り水気を取る。","両面こんがり焼く。","タレを作る。","タレを回しかけ5分煮絡める。","長ネギとごまを散らして完成！"],tip:"焼かずにそのまま煮てもOK。"},
+{id:26,name:"ソルロンタン",korean:"설렁탕",emoji:"🥛",desc:"牛骨をじっくり煮込んだ白濁スープ",category:"スープ",level:"上級",time:"180分",servings:"4人分",mainIngredients:["牛肉","長ネギ"],subIngredients:["大根","素麺"],seasonings:["塩","コショウ","にんにく"],steps:["牛骨と牛肉を血抜きし茹でこぼす。","きれいな水で沸騰させる。","3時間以上白濁するまで煮込む。","牛肉をスライスし盛り付ける。","塩コショウで好みの味に。"],tip:"圧力鍋なら時短可能。"},
+{id:27,name:"オイキムチ",korean:"오이김치",emoji:"🥒",desc:"きゅうりにヤンニョムを詰めたさっぱりキムチ",category:"副菜",level:"初級",time:"30分",servings:"4本分",mainIngredients:["きゅうり","にんじん"],subIngredients:["ニラ","大根"],seasonings:["粉唐辛子","にんにく","砂糖","塩","魚醤"],steps:["きゅうりに塩をまぶし10分おく。","十字の切れ目を入れる。","ヤンニョムを作る。","切れ目に詰める。","すぐ食べても半日漬けてもGood！"],tip:"夏にぴったり！"},
+{id:28,name:"韓国風のり巻き卵焼き",korean:"계란말이",emoji:"🥚",desc:"野菜入りのふわふわ韓国風卵焼き",category:"副菜",level:"初級",time:"10分",servings:"2人分",mainIngredients:["卵","にんじん","長ネギ"],subIngredients:["ハム","チーズ"],seasonings:["塩","ごま油"],steps:["卵にみじん切りの野菜と塩を加える。","ごま油を引く。","卵液を1/3ずつ流して巻く。","3回に分けて巻く。","冷まして切って完成！"],tip:"チーズを芯にするととろ〜り最高。"},
+{id:29,name:"ラッポッキ",korean:"라볶이",emoji:"🍜",desc:"トッポギとラーメンの甘辛煮込み",category:"麺",level:"初級",time:"15分",servings:"2人分",mainIngredients:["トッポギ","インスタントラーメン"],subIngredients:["ゆで卵","キャベツ","長ネギ","さつま揚げ"],seasonings:["コチュジャン","砂糖","醤油","粉唐辛子"],steps:["水にソース材料を入れて沸かす。","トッポギ・キャベツを5分煮る。","ラーメンの麺を加え3〜4分煮る。","長ネギ・ゆで卵を添える。","チーズトッピングもおすすめ！"],tip:"付属スープは使わずコチュジャンソースで味付け。"},
+{id:30,name:"コングクス",korean:"콩국수",emoji:"🥜",desc:"豆乳ベースの冷たい麺。夏にぴったり",category:"麺",level:"中級",time:"30分",servings:"2人分",mainIngredients:["素麺","豆乳","きゅうり"],subIngredients:["トマト","卵","ごま"],seasonings:["塩","砂糖","ごま"],steps:["豆乳に塩・砂糖を混ぜて冷やす。","素麺を茹でて冷水で洗う。","きゅうり千切り、トマト薄切り。","素麺に豆乳スープを注ぐ。","具材とごまを盛り付けて完成！"],tip:"無調整豆乳でも十分美味しい。"},
+{id:31,name:"タッコチ",korean:"닭꼬치",emoji:"🍢",desc:"甘辛ソースの韓国風焼き鳥。屋台の定番",category:"軽食・おつまみ",level:"初級",time:"20分",servings:"4本分",mainIngredients:["鶏肉","長ネギ"],subIngredients:["パプリカ"],seasonings:["コチュジャン","ケチャップ","砂糖","醤油","にんにく","ごま油"],steps:["鶏肉と長ネギを一口大に切る。","竹串に交互に刺す。","タレを作る。","焼きながらタレを塗る。","ごまを振って完成！"],tip:"中〜弱火でじっくり焼くのがポイント。"},
+{id:32,name:"ホットク",korean:"호떡",emoji:"🥞",desc:"もちもち生地に黒砂糖シナモンの人気おやつ",category:"デザート",level:"中級",time:"30分",servings:"4個分",mainIngredients:["小麦粉","砂糖","イースト"],subIngredients:["シナモン","ピーナッツ"],seasonings:["塩","ごま油"],steps:["生地を作り30分発酵。","フィリングを作る。","生地にフィリングを包む。","フライパンで焼き平たく押す。","両面こんがりで完成！"],tip:"焼きたてアツアツは火傷注意！"},
+{id:33,name:"ソトックソトック",korean:"소떡소떡",emoji:"🍡",desc:"ソーセージとトッポギの串。屋台の人気おやつ",category:"軽食・おつまみ",level:"初級",time:"15分",servings:"4本分",mainIngredients:["トッポギ","ソーセージ"],subIngredients:[],seasonings:["コチュジャン","ケチャップ","砂糖","醤油"],steps:["トッポギを茹でソーセージを切る。","竹串に交互に刺す。","全面焼く。","タレを作る。","タレを塗って完成！"],tip:"子供も大好き！BBQにもぴったり。"},
+{id:34,name:"チャンジョリム",korean:"장조림",emoji:"🥩",desc:"牛肉の醤油煮。定番常備菜でご飯のお供に",category:"副菜",level:"中級",time:"60分",servings:"作り置き用",mainIngredients:["牛肉","卵"],subIngredients:["ししとう","にんにく"],seasonings:["醤油","砂糖","みりん","コショウ"],steps:["牛もも肉を茹でて裂く。","茹で汁に醤油・砂糖・にんにくを入れる。","牛肉とゆで卵を20分煮込む。","ししとうを加えて3分煮る。","冷蔵庫で1週間保存可能！"],tip:"作り置きの王様！お弁当にも便利。"},
+{id:35,name:"チョレギサラダ",korean:"겉절이",emoji:"🥬",desc:"ごま油香る韓国風やみつきサラダ",category:"副菜",level:"初級",time:"10分",servings:"2人分",mainIngredients:["サンチュ","きゅうり","海苔"],subIngredients:["トマト","玉ねぎ","豆腐"],seasonings:["ごま油","醤油","酢","にんにく","ごま","砂糖","塩"],steps:["サンチュをちぎりきゅうりを切る。","玉ねぎを薄切りにして水にさらす。","ドレッシングを作る。","野菜に海苔を散らす。","ドレッシングをかけて完成！"],tip:"食べる直前にかけるのがシャキシャキのコツ。"},
+{id:36,name:"タットリタン",korean:"닭도리탕",emoji:"🐔",desc:"鶏とじゃがいものコチュジャン煮込み",category:"チゲ・鍋",level:"中級",time:"40分",servings:"3人分",mainIngredients:["鶏肉","じゃがいも","玉ねぎ"],subIngredients:["にんじん","長ネギ","ズッキーニ"],seasonings:["コチュジャン","粉唐辛子","醤油","砂糖","にんにく","ごま油"],steps:["鶏肉を大きめに切る。","タレを煮立てる。","鶏肉を10分煮込む。","野菜を加え15分煮込む。","長ネギを加えて完成！"],tip:"じゃがいもが崩れるくらい煮るとトロトロで美味しい！"},
+{id:37,name:"ヘムルタン",korean:"해물탕",emoji:"🦀",desc:"海鮮たっぷりのピリ辛鍋",category:"チゲ・鍋",level:"中級",time:"30分",servings:"2人分",mainIngredients:["エビ","イカ","あさり"],subIngredients:["白菜","豆腐","長ネギ","えのき"],seasonings:["コチュジャン","粉唐辛子","にんにく","醤油","ごま油"],steps:["海鮮の下処理をする。","ごま油でにんにくを炒める。","スープを沸騰させる。","海鮮・野菜・豆腐を10分煮込む。","長ネギを散らして完成！"],tip:"シーフードミックスでも手軽に作れます。"},
+{id:38,name:"カルビチム",korean:"갈비찜",emoji:"🍖",desc:"牛カルビの甘辛煮込み。お祝いの日の定番",category:"メイン",level:"上級",time:"90分",servings:"3人分",mainIngredients:["牛肉","大根","にんじん"],subIngredients:["栗","なつめ","銀杏","卵"],seasonings:["醤油","砂糖","にんにく","生姜","ごま油","梨","ごま"],steps:["牛カルビを血抜きする。","茹でこぼして30分煮込む。","タレを作る。","大根・にんじんとタレで30分煮込む。","栗・なつめを加えて完成！"],tip:"圧力鍋なら時短可能！"},
+{id:39,name:"コンナムルクッパ",korean:"콩나물국밥",emoji:"🍲",desc:"豆もやしスープ飯。二日酔いの味方",category:"ご飯もの",level:"初級",time:"20分",servings:"1人分",mainIngredients:["もやし","ご飯","卵"],subIngredients:["長ネギ","キムチ"],seasonings:["にんにく","醤油","塩","ごま油","粉唐辛子"],steps:["水とにんにくを沸騰させる。","もやしを蓋をして5分煮込む。","味を整える。","ご飯にスープを注ぐ。","卵・長ネギ・ごま油をかけて完成！"],tip:"蓋を開けずに煮ると豆臭さが消えます。"},
+{id:40,name:"ピビンネンミョン",korean:"비빔냉면",emoji:"🌶️",desc:"辛いタレで混ぜる汁なし冷麺",category:"麺",level:"初級",time:"15分",servings:"1人分",mainIngredients:["冷麺","きゅうり","卵"],subIngredients:["梨","キムチ"],seasonings:["コチュジャン","酢","砂糖","ごま油","ごま"],steps:["麺を茹でて冷水で洗う。","ピビンタレを作る。","具材を切る。","麺にタレと具材を盛る。","よく混ぜて食べる！"],tip:"辛さと酸味のバランスが命！"},
+{id:41,name:"パジョン",korean:"파전",emoji:"🧅",desc:"長ネギたっぷりの韓国風ネギ焼き",category:"軽食・おつまみ",level:"初級",time:"15分",servings:"1枚分",mainIngredients:["長ネギ","小麦粉","卵"],subIngredients:["にんじん"],seasonings:["塩","ごま油","醤油","酢"],steps:["長ネギを縦半分に切る。","生地を作る。","ごま油で長ネギを並べる。","生地を流し入れ両面焼く。","酢醤油で食べる！"],tip:"マッコリのお供に最高！"},
+{id:42,name:"テジクッパ",korean:"돼지국밥",emoji:"🐷",desc:"豚骨スープ飯。釜山名物",category:"ご飯もの",level:"中級",time:"60分",servings:"2人分",mainIngredients:["豚肉","ご飯","長ネギ"],subIngredients:["もやし","ニラ"],seasonings:["塩","コショウ","にんにく","醤油"],steps:["豚バラ塊を30分茹でる。","肉をスライスする。","もやしを加え5分煮込む。","ご飯にスープを注ぎ豚肉を乗せる。","長ネギ・ニラを散らして完成！"],tip:"アミの塩辛を入れると本場の味に！"},
+{id:43,name:"キムチマンドゥ",korean:"김치만두",emoji:"🥟",desc:"キムチと豚肉の韓国風餃子",category:"軽食・おつまみ",level:"中級",time:"45分",servings:"20個分",mainIngredients:["餃子の皮","豚肉","キムチ"],subIngredients:["豆腐","ニラ","もやし"],seasonings:["ごま油","醤油","にんにく","塩","コショウ"],steps:["キムチを絞ってみじん切り。豆腐も水切り。","タネを混ぜ合わせる。","皮に包む。","蒸すか焼く。","酢醤油で食べる！"],tip:"冷凍保存もできます！"},
+{id:44,name:"マンドゥグク",korean:"만두국",emoji:"🍜",desc:"餃子入りスープ。お正月に欠かせない",category:"スープ",level:"中級",time:"30分",servings:"2人分",mainIngredients:["餃子","卵","長ネギ"],subIngredients:["海苔","にんにく"],seasonings:["醤油","塩","ごま油","コショウ"],steps:["水とにんにくを沸騰させる。","餃子を5分煮る。","味を整える。","溶き卵を回し入れる。","長ネギ・海苔・ごま油をかけて完成！"],tip:"トックも入れると「トックマンドゥグク」に！"},
+{id:45,name:"タッペクスク",korean:"닭백숙",emoji:"🍗",desc:"鶏のシンプルな水炊き",category:"スープ",level:"中級",time:"60分",servings:"3人分",mainIngredients:["鶏肉","長ネギ","にんにく"],subIngredients:["生姜","なつめ"],seasonings:["塩","コショウ"],steps:["鶏肉を洗う。","全材料と水を入れ強火にかける。","アクを取り弱火で40分〜1時間煮込む。","鶏肉を裂く。","塩コショウで食べる。"],tip:"サムゲタンよりシンプルで簡単。"},
+{id:46,name:"トックスープ",korean:"떡국",emoji:"🍲",desc:"韓国餅の正月スープ。食べると1歳取るとか",category:"スープ",level:"初級",time:"25分",servings:"2人分",mainIngredients:["トック","卵","長ネギ"],subIngredients:["牛肉","海苔","にんにく"],seasonings:["醤油","塩","ごま油"],steps:["トックを水に浸ける。","牛肉・にんにくで出汁を取る。","味を整える。","トックを3〜4分煮る。","卵・長ネギ・海苔をかけて完成！"],tip:"韓国のお正月に必ず食べる料理。"},
+{id:47,name:"チムタク",korean:"찜닭",emoji:"🍗",desc:"鶏と野菜の甘辛醤油煮込み。安東名物",category:"メイン",level:"中級",time:"40分",servings:"3人分",mainIngredients:["鶏肉","じゃがいも","春雨"],subIngredients:["にんじん","玉ねぎ","長ネギ","しいたけ"],seasonings:["醤油","砂糖","にんにく","生姜","粉唐辛子","ごま油"],steps:["鶏肉を大きめに切る。","タレを煮立てる。","鶏肉を10分煮込む。","野菜を加え15分煮込む。","春雨と長ネギを加えて完成！"],tip:"春雨がタレを吸って最高！"},
+{id:48,name:"ヤンニョムケジャン",korean:"양념게장",emoji:"🦀",desc:"渡り蟹のヤンニョム漬け。ご飯泥棒",category:"副菜",level:"上級",time:"30分",servings:"2人分",mainIngredients:["渡り蟹","玉ねぎ"],subIngredients:["長ネギ","にんじん"],seasonings:["コチュジャン","粉唐辛子","にんにく","生姜","醤油","砂糖","ごま油","ごま"],steps:["蟹を洗い切る。","ヤンニョムを作る。","野菜を切る。","蟹にヤンニョムを絡める。","半日漬けて完成！"],tip:"ご飯が何杯でも食べられる危険な料理！"},
+{id:49,name:"ポックンパ",korean:"볶음밥",emoji:"🍳",desc:"鍋のシメ！残りスープでご飯を炒める",category:"ご飯もの",level:"初級",time:"10分",servings:"2人分",mainIngredients:["ご飯","卵","海苔"],subIngredients:["キムチ","チーズ"],seasonings:["ごま油","ごま","塩"],steps:["残りスープにご飯を入れる。","混ぜながら炒める。","パラパラにする。","チーズや卵を加える。","海苔・ごまで仕上げ！"],tip:"おこげができると最高。"},
+{id:50,name:"カルグクス",korean:"칼국수",emoji:"🍜",desc:"手打ち平麺のあっさりスープ。韓国のうどん",category:"麺",level:"中級",time:"30分",servings:"2人分",mainIngredients:["小麦粉","あさり","ズッキーニ"],subIngredients:["じゃがいも","長ネギ","にんにく"],seasonings:["塩","醤油","ごま油"],steps:["生地を作り30分休ませる。","薄く伸ばし5mm幅に切る。","あさりで出汁を取る。","麺と野菜を7〜8分煮込む。","塩で味を整えて完成！"],tip:"うどんで代用OK。あさりの出汁が決め手！"},
+{id:51,name:"スジェビ",korean:"수제비",emoji:"🫓",desc:"手でちぎった生地のスープ。韓国風すいとん",category:"麺",level:"初級",time:"25分",servings:"2人分",mainIngredients:["小麦粉","じゃがいも","ズッキーニ"],subIngredients:["長ネギ","にんにく","玉ねぎ"],seasonings:["塩","醤油","ごま油"],steps:["生地を作り20分休ませる。","出汁を沸騰させる。","野菜を5分煮る。","生地を薄くちぎって入れ5分煮込む。","味を整えて完成！"],tip:"薄くちぎるのがコツ。もちもち食感！"},
+{id:52,name:"ブデチゲ",korean:"부대찌개",emoji:"🍲",desc:"ソーセージやラーメンの部隊鍋。ジャンクだけどクセになる",category:"チゲ・鍋",level:"初級",time:"20分",servings:"2人分",mainIngredients:["ソーセージ","インスタントラーメン","キムチ"],subIngredients:["豆腐","もち","スパム","長ネギ","えのき"],seasonings:["コチュジャン","粉唐辛子","にんにく","醤油","砂糖"],steps:["具材を切って鍋に並べる。","タレを作って入れる。","水を注ぎ沸騰させる。","ラーメンの麺を加える。","長ネギを散らして完成！"],tip:"具材は何でもOK！チーズも定番。"},
+{id:53,name:"ミヨックク",korean:"미역국",emoji:"🌊",desc:"わかめスープ。誕生日に食べる特別なスープ",category:"スープ",level:"初級",time:"20分",servings:"2人分",mainIngredients:["わかめ","牛肉"],subIngredients:["にんにく"],seasonings:["ごま油","醤油","塩"],steps:["わかめを戻して切る。","ごま油で牛肉を炒める。","わかめを加えて炒める。","水・醤油・にんにくを加え15分煮込む。","塩で味を整えて完成！"],tip:"誕生日にお母さんが作ってくれるスープ。"},
+{id:54,name:"ケランパン",korean:"계란빵",emoji:"🍞",desc:"卵まるごと入りの韓国屋台パン",category:"デザート",level:"初級",time:"20分",servings:"4個分",mainIngredients:["卵","ホットケーキミックス"],subIngredients:["チーズ","ハム"],seasonings:["砂糖","塩"],steps:["生地を作る。","型に半分まで流す。","卵を1個割り入れる。","トッピングを乗せる。","180℃で15分焼いて完成！"],tip:"たこ焼き器でミニサイズも可愛い！"},
+{id:55,name:"ヤクパプ",korean:"약밥",emoji:"🍯",desc:"もち米にナツメ・栗・蜂蜜の伝統甘味おこわ",category:"デザート",level:"中級",time:"60分",servings:"4人分",mainIngredients:["もち米","栗","なつめ"],subIngredients:["松の実","レーズン"],seasonings:["醤油","砂糖","ごま油","シナモン","蜂蜜"],steps:["もち米を一晩浸ける。","炊飯器で炊く。","具材を混ぜ込む。","蜂蜜・シナモンを加える。","型に詰めて冷まして完成！"],tip:"甘じょっぱさがクセになる伝統料理。"},
+{id:56,name:"韓国風甘辛手羽先",korean:"매운닭날개",emoji:"🍗",desc:"コチュジャンダレの手羽先。ビールが止まらない",category:"メイン",level:"初級",time:"30分",servings:"2人分",mainIngredients:["手羽先","にんにく"],subIngredients:["長ネギ"],seasonings:["コチュジャン","醤油","砂糖","ごま油","ごま","コショウ"],steps:["手羽先に下味をつける。","タレを作る。","皮面から中火で焼く。","タレを絡めながら煮詰める。","ごまと長ネギを散らして完成！"],tip:"オーブンだとさらにパリッと仕上がる。"},
+{id:57,name:"クンマンドゥ",korean:"군만두",emoji:"🥟",desc:"カリカリ韓国風焼き餃子。屋台の人気メニュー",category:"軽食・おつまみ",level:"初級",time:"20分",servings:"10個分",mainIngredients:["餃子の皮","豚肉","キャベツ"],subIngredients:["ニラ","豆腐","もやし"],seasonings:["ごま油","醤油","にんにく","塩","コショウ"],steps:["タネを混ぜ合わせる。","皮に包む。","ごま油で並べて焼く。","水を加え蓋をして蒸し焼き。","底がカリカリになったら完成！"],tip:"酢醤油＋コチュジャンのタレが最高。"},
+{id:58,name:"ティギム",korean:"튀김",emoji:"🍤",desc:"韓国式天ぷら。トッポギと食べるのが定番",category:"軽食・おつまみ",level:"初級",time:"20分",servings:"2人分",mainIngredients:["さつまいも","エビ","小麦粉"],subIngredients:["ズッキーニ","玉ねぎ","ししとう"],seasonings:["塩","ごま油"],steps:["野菜を切る。","冷水で衣を作る。","衣をつけ170℃で揚げる。","油を切る。","トッポギのソースにつけて食べる！"],tip:"衣は冷水で作るとサクサク。"},
+{id:59,name:"タンスユク",korean:"탕수육",emoji:"🍖",desc:"韓国式酢豚。カリカリ衣に甘酢あん",category:"メイン",level:"中級",time:"40分",servings:"2人分",mainIngredients:["豚肉","片栗粉","玉ねぎ"],subIngredients:["にんじん","きゅうり","パプリカ"],seasonings:["酢","砂糖","醤油","ケチャップ"],steps:["豚肉に片栗粉をまぶす。","二度揚げでカリカリに。","甘酢あんを作る。","野菜を加えとろみをつける。","豚肉にあんをかけて完成！"],tip:"かける派 vs つける派で論争が！"},
+{id:60,name:"パッピンス",korean:"팥빙수",emoji:"🍧",desc:"かき氷にあずき・餅・フルーツの夏スイーツ",category:"デザート",level:"初級",time:"10分",servings:"2人分",mainIngredients:["氷","あずき","餅"],subIngredients:["フルーツ","練乳","きなこ"],seasonings:["砂糖"],steps:["氷を細かく削る。","山盛りに盛る。","あずきをかける。","餅・フルーツをトッピング。","練乳ときなこで完成！"],tip:"牛乳氷で作るとミルキーで美味しい！"}
 ];
 
-// ============================================================
-// STATE
-// ============================================================
-let ingTags = [];
-let fridgeTags = [];
-
-// ============================================================
-// TAB SWITCHING
-// ============================================================
-function switchTab(tab) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  const idx = {ingredient:0, recipe:1, fridge:2}[tab];
-  document.querySelectorAll('.tab-btn')[idx].classList.add('active');
-  if (tab === 'recipe') renderDishGrid('');
+const quickIngredients=["豚肉","鶏肉","牛肉","豆腐","卵","キムチ","ご飯","もやし","長ネギ","玉ねぎ","にんじん","きゅうり","キャベツ","ほうれん草","にんにく","チーズ","海苔","じゃがいも","トッポギ","小麦粉","エビ","イカ","あさり","ニラ","さつまいも","春雨","餃子の皮","ソーセージ"];
+let selectedIngredients=[];
+function init(){renderQuickTags();renderTags();searchByIngredients();searchByName()}
+function switchMode(m){
+  document.getElementById('deskModeIng').classList.toggle('active',m==='ingredient');
+  document.getElementById('deskModeRec').classList.toggle('active',m==='recipe');
+  document.getElementById('navIng').classList.toggle('active',m==='ingredient');
+  document.getElementById('navRec').classList.toggle('active',m==='recipe');
+  document.getElementById('ingredientMode').style.display=m==='ingredient'?'block':'none';
+  document.getElementById('recipeMode').style.display=m==='recipe'?'block':'none';
+  if(m==='recipe')searchByName();
+  window.scrollTo({top:0,behavior:'smooth'});
 }
-
-// ============================================================
-// TAB 1: INGREDIENT → DISHES
-// ============================================================
-function addIngredient() {
-  const input = document.getElementById('ing-input');
-  const val = input.value.trim();
-  if (!val) return;
-  const items = val.split(/[、,，\s]+/).map(s => s.trim()).filter(Boolean);
-  items.forEach(item => {
-    if (item && !ingTags.includes(item)) ingTags.push(item);
-  });
-  input.value = '';
-  renderIngTags();
+function renderQuickTags(){
+  document.getElementById('quickTags').innerHTML=quickIngredients.map(i=>`<button class="quick-tag ${selectedIngredients.includes(i)?'selected':''}" onclick="toggleQuickTag('${i}')">${i}</button>`).join('');
 }
-
-function renderIngTags() {
-  const area = document.getElementById('ing-tags');
-  area.innerHTML = ingTags.map((t, i) =>
-    `<div class="tag">${t}<span class="remove" onclick="removeIngTag(${i})">×</span></div>`
-  ).join('');
+function toggleQuickTag(i){const x=selectedIngredients.indexOf(i);if(x>-1)selectedIngredients.splice(x,1);else selectedIngredients.push(i);renderTags();renderQuickTags();searchByIngredients()}
+function addIngredient(){const input=document.getElementById('ingredientInput');const v=input.value.trim();if(v&&!selectedIngredients.includes(v)){selectedIngredients.push(v);renderTags();renderQuickTags();searchByIngredients()}input.value=''}
+function removeIngredient(i){selectedIngredients=selectedIngredients.filter(x=>x!==i);renderTags();renderQuickTags();searchByIngredients()}
+function renderTags(){document.getElementById('tagsArea').innerHTML=selectedIngredients.map(i=>`<span class="tag">${i}<button class="tag-remove" aria-label="${i}を削除" onclick="removeIngredient('${i}')">✕</button></span>`).join('')}
+function searchByIngredients(){
+  if(!selectedIngredients.length){document.getElementById('ingredientResults').innerHTML=`<div class="empty-state"><div class="empty-emoji">🧊</div><div class="empty-title">食材を追加してね！</div><div class="empty-desc">冷蔵庫にある食材を入力するか、<br>よく使う食材タグをタップしてみて</div></div>`;return}
+  const results=recipes.map(r=>{
+    const all=[...r.mainIngredients,...r.subIngredients];
+    const matched=all.filter(i=>selectedIngredients.some(s=>i.includes(s)||s.includes(i)));
+    const missing=all.filter(i=>!selectedIngredients.some(s=>i.includes(s)||s.includes(i)));
+    const mm=r.mainIngredients.filter(i=>selectedIngredients.some(s=>i.includes(s)||s.includes(i)));
+    const score=(mm.length*2+matched.length)/(r.mainIngredients.length*2+all.length)*100;
+    return{...r,matched,missing,score:Math.round(score)}
+  }).filter(r=>r.score>0).sort((a,b)=>b.score-a.score);
+  const c=document.getElementById('ingredientResults');
+  if(!results.length){c.innerHTML=`<div class="empty-state"><div class="empty-emoji">😢</div><div class="empty-title">見つからなかったよ…</div><div class="empty-desc">別の食材を追加してみてね！</div></div>`;return}
+  c.innerHTML=`<div class="results-header"><h2>🎉 作れそうな韓国料理</h2><span class="results-count">${results.length}件</span></div><div class="results-grid">${results.map(r=>`<div class="recipe-card" onclick="openModal(${r.id})"><div class="card-top"><div class="card-emoji">${r.emoji}</div><div class="card-info"><div class="card-title">${r.name} <span class="card-korean">${r.korean}</span></div><div class="card-desc">${r.desc}</div></div></div><div class="match-bar-wrap"><div class="match-label"><span>食材マッチ度</span><span class="pct">${r.score}%</span></div><div class="match-bar"><div class="match-fill" style="width:${r.score}%"></div></div></div><div class="card-tags">${r.matched.map(m=>`<span class="card-tag have">✓ ${m}</span>`).join('')}${r.missing.slice(0,4).map(m=>`<span class="card-tag need">＋ ${m}</span>`).join('')}${r.missing.length>4?`<span class="card-tag need">他${r.missing.length-4}つ</span>`:''}</div><span class="card-arrow">›</span></div>`).join('')}</div>`;
 }
-
-function removeIngTag(i) {
-  ingTags.splice(i, 1);
-  renderIngTags();
+function searchByName(){
+  const q=document.getElementById('recipeSearchInput')?.value.trim().toLowerCase()||'';
+  const f=q?recipes.filter(r=>r.name.toLowerCase().includes(q)||r.korean.includes(q)||r.category.includes(q)||r.desc.includes(q)):recipes;
+  const c=document.getElementById('recipeResults');
+  if(!f.length){c.innerHTML=`<div class="empty-state"><div class="empty-emoji">🔍</div><div class="empty-title">見つからなかったよ…</div><div class="empty-desc">別のキーワードで検索してみてね</div></div>`;return}
+  c.innerHTML=`<div class="results-header"><h2>${q?'🔎 検索結果':'📚 全レシピ一覧'}</h2><span class="results-count">${f.length}件</span></div><div class="all-recipes-grid">${f.map(r=>`<div class="mini-card" onclick="openModal(${r.id})"><div class="mini-emoji">${r.emoji}</div><div class="mini-info"><div class="mini-title">${r.name} <span style="font-weight:400;color:#999;font-size:11px">${r.korean}</span></div><div class="mini-sub">${r.category} ・ ${r.level} ・ ${r.time}</div></div><span class="mini-arrow">›</span></div>`).join('')}</div>`;
 }
-
-function searchByIngredients() {
-  const results = document.getElementById('ing-results');
-  if (ingTags.length === 0) {
-    results.innerHTML = `<div class="empty-state"><div class="icon">🥕</div><p>食材を入力してください</p></div>`;
-    return;
-  }
-  const normalizedInput = ingTags.map(t => normalize(t));
-  const scored = RECIPES.map(r => {
-    const matched = r.tags.filter(tag => normalizedInput.some(ni => normalize(tag).includes(ni) || ni.includes(normalize(tag))));
-    return { recipe: r, matched, score: matched.length };
-  }).filter(r => r.score > 0).sort((a, b) => b.score - a.score);
-
-  if (scored.length === 0) {
-    results.innerHTML = `<div class="no-results"><div class="icon">😅</div><p>その食材で作れる料理が見つかりませんでした。<br>別の食材を試してみてください。</p></div>`;
-    return;
-  }
-
-  results.innerHTML = `<p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:12px">${scored.length}件の料理が見つかりました</p>` +
-    scored.map(({ recipe: r, matched }) => {
-      const chips = r.tags.map(tag => {
-        const isMatch = matched.some(m => normalize(m) === normalize(tag));
-        return `<span class="chip${isMatch ? ' matched' : ''}">${tag}</span>`;
-      }).join('');
-      return `<div class="dish-card" onclick="showRecipeDetail('${r.id}', 'ingredient')">
-        <div class="dish-card-header">
-          <div class="dish-emoji">${r.emoji}</div>
-          <div class="dish-name-block">
-            <div class="dish-name-jp">${r.nameJp}</div>
-            <div class="dish-name-kr">${r.nameKr}</div>
-          </div>
-          <div class="match-badge">${matched.length}/${ingTags.length} 一致</div>
-        </div>
-        <div class="dish-card-body">
-          <div class="dish-desc">${r.desc}</div>
-          <div class="ingredient-chips">${chips}</div>
-        </div>
-      </div>`;
-    }).join('');
+function openModal(id){
+  const r=recipes.find(x=>x.id===id);if(!r)return;
+  document.getElementById('modalBody').innerHTML=`<div class="modal-emoji">${r.emoji}</div><div class="modal-title">${r.name}</div><div class="modal-korean">${r.korean}</div><div class="modal-desc">${r.desc}</div><div class="modal-meta"><div class="meta-item"><span>📂</span> ${r.category}</div><div class="meta-item"><span>📊</span> ${r.level}</div><div class="meta-item"><span>⏱️</span> ${r.time}</div><div class="meta-item"><span>👥</span> ${r.servings}</div></div><div class="modal-section"><h3><span>🥬</span> 材料</h3><div class="ingredients-grid">${r.mainIngredients.map(i=>`<div class="ingredient-item"><span class="dot main"></span>${i}<span style="font-size:10px;color:#999;margin-left:auto">メイン</span></div>`).join('')}${r.subIngredients.map(i=>`<div class="ingredient-item"><span class="dot sub"></span>${i}</div>`).join('')}${r.seasonings.map(i=>`<div class="ingredient-item"><span class="dot sauce"></span>${i}<span style="font-size:10px;color:#999;margin-left:auto">調味料</span></div>`).join('')}</div></div><div class="modal-section"><h3><span>👨‍🍳</span> 作り方</h3><ol class="steps-list">${r.steps.map((s,i)=>`<li class="step-item"><span class="step-num">${i+1}</span><span class="step-text">${s}</span></li>`).join('')}</ol></div><div class="modal-section"><h3><span>💡</span> コツ・ポイント</h3><div class="tip-box">${r.tip}</div></div>`;
+  document.getElementById('modalOverlay').classList.add('show');
+  document.getElementById('modal').scrollTop=0;
+  document.body.style.overflow='hidden';
 }
-
-// ============================================================
-// TAB 2: RECIPE NAME → RECIPE
-// ============================================================
-function renderDishGrid(filter) {
-  const norm = normalize(filter);
-  const grid = document.getElementById('dish-grid');
-  const filtered = RECIPES.filter(r =>
-    !norm ||
-    normalize(r.nameJp).includes(norm) ||
-    normalize(r.nameKr).includes(norm) ||
-    r.tags.some(t => normalize(t).includes(norm))
-  );
-  grid.innerHTML = filtered.map(r =>
-    `<div class="dish-grid-item" onclick="showRecipeDetail('${r.id}', 'recipe')">
-      <div class="em">${r.emoji}</div>
-      <div class="nm">${r.nameJp}</div>
-      <div class="kr">${r.nameKr}</div>
-    </div>`
-  ).join('');
+function closeModal(){document.getElementById('modalOverlay').classList.remove('show');document.body.style.overflow=''}
+// Enterキー(スマホキーボードの「完了」)で食材追加
+document.getElementById('ingredientInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addIngredient()}});
+// 背景タップでモーダルを閉じる
+document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal()});
+// Swipe down to close
+(function(){let sy=0,cy=0,d=false;const h=document.getElementById('modalHandleArea'),m=document.getElementById('modal');
+h.addEventListener('touchstart',e=>{if(m.scrollTop<=0){sy=e.touches[0].clientY;cy=sy;d=true;m.style.transition='none'}},{passive:true});
+h.addEventListener('touchmove',e=>{if(!d)return;cy=e.touches[0].clientY;const df=cy-sy;if(df>0){m.style.transform=`translateY(${df}px)`;m.style.opacity=Math.max(.5,1-df/400)}},{passive:true});
+h.addEventListener('touchend',()=>{if(!d)return;d=false;m.style.transition='transform .3s ease,opacity .3s ease';if(cy-sy>120)closeModal();m.style.transform='';m.style.opacity=''})})();
+// Scroll top button
+window.addEventListener('scroll',()=>{const b=document.getElementById('scrollTopBtn');if(window.scrollY>400)b.classList.add('show');else b.classList.remove('show')},{passive:true});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+init();
+// PWA: オフラインでも動くようにService Workerを登録
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 }
-
-function filterDishGrid() {
-  const val = document.getElementById('recipe-input').value;
-  renderDishGrid(val);
-  document.getElementById('recipe-results').innerHTML = '';
-}
-
-function searchRecipe() {
-  const val = document.getElementById('recipe-input').value.trim();
-  if (!val) return;
-  const norm = normalize(val);
-  const found = RECIPES.find(r =>
-    normalize(r.nameJp).includes(norm) ||
-    normalize(r.nameKr).includes(norm)
-  );
-  if (found) {
-    showRecipeDetail(found.id, 'recipe');
-  } else {
-    document.getElementById('recipe-results').innerHTML =
-      `<div class="no-results"><div class="icon">🤔</div><p>「${val}」のレシピが見つかりませんでした</p></div>`;
-  }
-}
-
-function showRecipeDetail(id, tabId) {
-  const r = RECIPES.find(r => r.id === id);
-  if (!r) return;
-  const html = `
-    <div class="recipe-card">
-      <div class="recipe-header">
-        <div class="recipe-emoji">${r.emoji}</div>
-        <div>
-          <div class="recipe-title">${r.nameJp}</div>
-          <div class="recipe-subtitle">${r.nameKr} — ${r.desc}</div>
-        </div>
-      </div>
-      <div class="recipe-body">
-        <div class="meta-row">
-          <div class="meta-item">⏱️ ${r.time}</div>
-          <div class="meta-item">👥 ${r.serving}</div>
-          <div class="meta-item">🔥 難易度 ${r.difficulty}</div>
-        </div>
-        <div class="recipe-section">
-          <div class="recipe-section-title">材料</div>
-          <ul class="ingredient-list">
-            ${r.ingredients.map(i => `<li><span class="ing-bullet">▸</span><span>${i.name}</span><span style="margin-left:auto;color:var(--text-muted)">${i.amount}</span></li>`).join('')}
-          </ul>
-        </div>
-        <div class="recipe-section">
-          <div class="recipe-section-title">作り方</div>
-          <ol class="step-list">
-            ${r.steps.map(s => `<li>${s}</li>`).join('')}
-          </ol>
-        </div>
-      </div>
-    </div>`;
-  document.getElementById(tabId === 'ingredient' ? 'ing-results' : 'recipe-results').innerHTML = html;
-  // Scroll to results
-  setTimeout(() => {
-    document.getElementById(tabId === 'ingredient' ? 'ing-results' : 'recipe-results')
-      .scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 50);
-}
-
-// ============================================================
-// TAB 3: FRIDGE → SUGGEST
-// ============================================================
-function addFridgeItem() {
-  const input = document.getElementById('fridge-input');
-  const val = input.value.trim();
-  if (!val) return;
-  const items = val.split(/[、,，\s]+/).map(s => s.trim()).filter(Boolean);
-  items.forEach(item => {
-    if (item && !fridgeTags.includes(item)) fridgeTags.push(item);
-  });
-  input.value = '';
-  renderFridgeTags();
-}
-
-function renderFridgeTags() {
-  const area = document.getElementById('fridge-tags');
-  area.innerHTML = fridgeTags.map((t, i) =>
-    `<div class="tag">${t}<span class="remove" onclick="removeFridgeTag(${i})">×</span></div>`
-  ).join('');
-}
-
-function removeFridgeTag(i) {
-  fridgeTags.splice(i, 1);
-  renderFridgeTags();
-}
-
-function clearFridge() {
-  fridgeTags = [];
-  renderFridgeTags();
-  document.getElementById('fridge-results').innerHTML = '';
-}
-
-function suggestFromFridge() {
-  const results = document.getElementById('fridge-results');
-  if (fridgeTags.length === 0) {
-    results.innerHTML = `<div class="empty-state"><div class="icon">🧊</div><p>冷蔵庫の食材を追加してください</p></div>`;
-    return;
-  }
-  const normalizedFridge = fridgeTags.map(t => normalize(t));
-
-  const scored = RECIPES.map(r => {
-    const totalTags = r.tags.length;
-    const matched = r.tags.filter(tag =>
-      normalizedFridge.some(ni => normalize(tag).includes(ni) || ni.includes(normalize(tag)))
-    );
-    const ratio = matched.length / totalTags;
-    return { recipe: r, matched, total: totalTags, ratio };
-  }).filter(r => r.matched.length > 0)
-    .sort((a, b) => b.ratio - a.ratio || b.matched.length - a.matched.length);
-
-  if (scored.length === 0) {
-    results.innerHTML = `<div class="no-results"><div class="icon">😅</div><p>冷蔵庫の食材では作れる料理が見つかりませんでした。<br>食材を追加してみてください。</p></div>`;
-    return;
-  }
-
-  results.innerHTML = `<p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:12px">${scored.length}件の料理が提案されました（食材一致率順）</p>` +
-    scored.map(({ recipe: r, matched, total, ratio }) => {
-      const pct = Math.round(ratio * 100);
-      const chips = r.tags.map(tag => {
-        const isMatch = matched.some(m => normalize(m) === normalize(tag));
-        return `<span class="chip${isMatch ? ' matched' : ''}">${tag}</span>`;
-      }).join('');
-      return `<div class="dish-card" onclick="showFridgeDetail('${r.id}')">
-        <div class="dish-card-header">
-          <div class="dish-emoji">${r.emoji}</div>
-          <div class="dish-name-block">
-            <div class="dish-name-jp">${r.nameJp}</div>
-            <div class="dish-name-kr">${r.nameKr}</div>
-          </div>
-          <div class="match-badge">${matched.length}/${total}</div>
-        </div>
-        <div class="dish-card-body">
-          <div class="dish-desc">${r.desc}</div>
-          <div class="fridge-score">
-            <div class="score-bar-bg"><div class="score-bar-fill" style="width:${pct}%"></div></div>
-            <span class="score-text">食材一致率 ${pct}%</span>
-          </div>
-          <div class="ingredient-chips" style="margin-top:10px">${chips}</div>
-        </div>
-      </div>`;
-    }).join('');
-}
-
-function showFridgeDetail(id) {
-  const r = RECIPES.find(r => r.id === id);
-  if (!r) return;
-  const normalizedFridge = fridgeTags.map(t => normalize(t));
-  const missing = r.ingredients.filter(ing =>
-    !normalizedFridge.some(f => normalize(ing.name).includes(f) || f.includes(normalize(ing.name)))
-  );
-
-  let missingHtml = '';
-  if (missing.length > 0) {
-    missingHtml = `<div class="recipe-section">
-      <div class="recipe-section-title" style="color:var(--red)">不足している食材</div>
-      <ul class="ingredient-list">
-        ${missing.map(i => `<li><span class="ing-bullet" style="color:var(--red)">!</span><span>${i.name}</span><span style="margin-left:auto;color:var(--text-muted)">${i.amount}</span></li>`).join('')}
-      </ul>
-    </div>`;
-  }
-
-  const resultEl = document.getElementById('fridge-results');
-  resultEl.innerHTML = `
-    <div class="recipe-card" style="margin-top:20px">
-      <div class="recipe-header">
-        <div class="recipe-emoji">${r.emoji}</div>
-        <div>
-          <div class="recipe-title">${r.nameJp}</div>
-          <div class="recipe-subtitle">${r.nameKr} — ${r.desc}</div>
-        </div>
-      </div>
-      <div class="recipe-body">
-        <div class="meta-row">
-          <div class="meta-item">⏱️ ${r.time}</div>
-          <div class="meta-item">👥 ${r.serving}</div>
-          <div class="meta-item">🔥 難易度 ${r.difficulty}</div>
-        </div>
-        ${missingHtml}
-        <div class="recipe-section">
-          <div class="recipe-section-title">材料（全て）</div>
-          <ul class="ingredient-list">
-            ${r.ingredients.map(i => {
-              const has = normalizedFridge.some(f => normalize(i.name).includes(f) || f.includes(normalize(i.name)));
-              return `<li style="${has ? 'opacity:1' : 'opacity:0.5'}">
-                <span class="ing-bullet">${has ? '✓' : '▸'}</span>
-                <span>${i.name}</span>
-                <span style="margin-left:auto;color:var(--text-muted)">${i.amount}</span>
-              </li>`;
-            }).join('')}
-          </ul>
-        </div>
-        <div class="recipe-section">
-          <div class="recipe-section-title">作り方</div>
-          <ol class="step-list">
-            ${r.steps.map(s => `<li>${s}</li>`).join('')}
-          </ol>
-        </div>
-      </div>
-    </div>`;
-  setTimeout(() => {
-    document.querySelector('.recipe-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 50);
-}
-
-// ============================================================
-// UTILITY
-// ============================================================
-function normalize(str) {
-  return str
-    .toLowerCase()
-    .replace(/[ぁ-ん]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60))
-    .replace(/\s+/g, '');
-}
-
-// Init
-renderDishGrid('');
 </script>
 </body>
 </html>

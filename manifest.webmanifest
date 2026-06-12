@@ -1,0 +1,25 @@
+{
+  "name": "韓国料理レシピ",
+  "short_name": "韓国レシピ",
+  "description": "冷蔵庫の食材から作れる韓国料理を探せるレシピアプリ",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fff7f5",
+  "theme_color": "#d62828",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
