@@ -1,4 +1,4 @@
-const CACHE = 'korean-recipe-v1';
+const CACHE = 'korean-recipe-v2';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-maskable.svg'];
 
 self.addEventListener('install', e => {
